@@ -26,11 +26,13 @@ static const float g_InferredBoneThickness = 1.0f;
 /// <param name="lpCmdLine">command line arguments</param>
 /// <param name="nCmdShow">whether to display minimized, maximized, or normally</param>
 /// <returns>status</returns>
+/*
 int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
     KinectBase application;
     application.Run(hInstance, nCmdShow);
 }
+*/
 
 /// <summary>
 /// Constructor

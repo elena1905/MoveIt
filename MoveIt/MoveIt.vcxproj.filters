@@ -38,13 +38,13 @@
     <ClInclude Include="Ogre3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="KinectBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KinectBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

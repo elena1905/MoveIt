@@ -11,6 +11,7 @@
 #define __Ogre3D_h_
  
 #include "Ogre3DBase.h"
+//#include "NuiApi.h"
 
 class Ogre3D : public Ogre3DBase
 {

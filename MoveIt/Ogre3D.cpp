@@ -23,6 +23,12 @@ Ogre3D::~Ogre3D(void)
 //-------------------------------------------------------------------------------------
 void Ogre3D::createScene(void)
 {
+	// Instantiate KinectBase
+	m_pKinect = new KinectBase();
+
+	// Create KinectSensor instance for the first connected sensor
+	m_pKinect->CreateFirstConnected();
+
 	// Set the scene's ambient light
 	mSceneMgr->setAmbientLight(Ogre::ColourValue(0, 0, 0));
 

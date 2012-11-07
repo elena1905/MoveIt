@@ -38,18 +38,18 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 /// Constructor
 /// </summary>
 KinectBase::KinectBase() :
-    m_pD2DFactory(NULL),
+//    m_pD2DFactory(NULL),
     m_hNextSkeletonEvent(INVALID_HANDLE_VALUE),
     m_pSkeletonStreamHandle(INVALID_HANDLE_VALUE),
     m_bSeatedMode(false),
-    m_pRenderTarget(NULL),
-    m_pBrushJointTracked(NULL),
-    m_pBrushJointInferred(NULL),
-    m_pBrushBoneTracked(NULL),
-    m_pBrushBoneInferred(NULL),
+//    m_pRenderTarget(NULL),
+//    m_pBrushJointTracked(NULL),
+//    m_pBrushJointInferred(NULL),
+//    m_pBrushBoneTracked(NULL),
+//    m_pBrushBoneInferred(NULL),
     m_pNuiSensor(NULL)
 {
-    ZeroMemory(m_Points,sizeof(m_Points));
+//>>>    ZeroMemory(m_Points,sizeof(m_Points));
 }
 
 /// <summary>
@@ -67,15 +67,18 @@ KinectBase::~KinectBase()
         CloseHandle(m_hNextSkeletonEvent);
     }
 
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     // clean up Direct2D objects
     DiscardDirect2DResources();
 
     // clean up Direct2D
     SafeRelease(m_pD2DFactory);
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 
     SafeRelease(m_pNuiSensor);
 }
 
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 /// <summary>
 /// Creates the main window and begins processing
 /// </summary>
@@ -247,6 +250,7 @@ LRESULT CALLBACK KinectBase::DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPA
 
     return FALSE;
 }
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 
 /// <summary>
 /// Create the first connected Kinect found 
@@ -301,7 +305,7 @@ HRESULT KinectBase::CreateFirstConnected()
 
     if (NULL == m_pNuiSensor || FAILED(hr))
     {
-        SetStatusMessage(L"No ready Kinect found!");
+//>>>        SetStatusMessage(L"No ready Kinect found!");
         return E_FAIL;
     }
 
@@ -324,6 +328,7 @@ void KinectBase::ProcessSkeleton()
     // smooth out the skeleton data
     m_pNuiSensor->NuiTransformSmooth(&skeletonFrame, NULL);
 
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     // Endure Direct2D is ready to draw
     hr = EnsureDirect2DResources( );
     if ( FAILED(hr) )
@@ -392,6 +397,7 @@ void KinectBase::ProcessSkeleton()
 			m_pRenderTarget->DrawEllipse(myEllipse, m_pBrushJointTracked);
 			end_time = ColeDateTime::GetCurrentTime-start_time;
 		}*/
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	}
 	//m_pRenderTarget->DrawEllipse(myEllipse, m_pBrushJointTracked);
 
@@ -404,8 +410,10 @@ void KinectBase::ProcessSkeleton()
         hr = S_OK;
         DiscardDirect2DResources();
     }
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 }
 
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 /// <summary>
 /// Draws a skeleton
 /// </summary>
@@ -592,3 +600,4 @@ void KinectBase::SetStatusMessage(WCHAR * szMessage)
 {
     SendDlgItemMessageW(m_hWnd, IDC_STATUS, WM_SETTEXT, 0, (LPARAM)szMessage);
 }
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/

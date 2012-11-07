@@ -11,7 +11,7 @@
 #define __Ogre3D_h_
  
 #include "Ogre3DBase.h"
-//#include "NuiApi.h"
+#include "KinectBase.h"
 
 class Ogre3D : public Ogre3DBase
 {
@@ -28,6 +28,7 @@ protected:
     virtual bool frameRenderingQueued(const Ogre::FrameEvent &evt);
     virtual bool nextLocation(void);
 	
+	KinectBase* m_pKinect;				   // Kinect instance
 
 	Ogre::Real mDistance;                  // The distance the object has left to travel
     Ogre::Vector3 mDirection;              // The direction the object is moving

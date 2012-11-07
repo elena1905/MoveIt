@@ -31,6 +31,7 @@ public:
     /// </summary>
     ~KinectBase();
 
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     /// <summary>
     /// Handles window messages, passes most to the class instance to handle
     /// </summary>
@@ -57,33 +58,44 @@ public:
     /// <param name="hInstance"></param>
     /// <param name="nCmdShow"></param>
     int                     Run(HINSTANCE hInstance, int nCmdShow);
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 
+
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 private:
     HWND                    m_hWnd;
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 
     bool                    m_bSeatedMode;
 
     // Current Kinect
     INuiSensor*             m_pNuiSensor;
 
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     // Skeletal drawing
     ID2D1HwndRenderTarget*   m_pRenderTarget;
     ID2D1SolidColorBrush*    m_pBrushJointTracked;
     ID2D1SolidColorBrush*    m_pBrushJointInferred;
     ID2D1SolidColorBrush*    m_pBrushBoneTracked;
     ID2D1SolidColorBrush*    m_pBrushBoneInferred;
-    D2D1_POINT_2F            m_Points[NUI_SKELETON_POSITION_COUNT];
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
+//>>>    D2D1_POINT_2F            m_Points[NUI_SKELETON_POSITION_COUNT];
 
+
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     // Direct2D
     ID2D1Factory*           m_pD2DFactory;
-    
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
+
     HANDLE                  m_pSkeletonStreamHandle;
     HANDLE                  m_hNextSkeletonEvent;
     
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     /// <summary>
     /// Main processing function
     /// </summary>
     void                    Update();
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 
     /// <summary>
     /// Create the first connected Kinect found 
@@ -96,6 +108,7 @@ private:
     /// </summary>
     void                    ProcessSkeleton();
 
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     /// <summary>
     /// Ensure necessary Direct2d resources are created
     /// </summary>
@@ -143,4 +156,5 @@ private:
     /// </summary>
     /// <param name="szMessage">message to display</param>
     void                    SetStatusMessage(WCHAR* szMessage);
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 };

@@ -38,13 +38,9 @@ Ogre3D::~Ogre3D(void)
 //-------------------------------------------------------------------------------------
 void Ogre3D::createScene(void)
 {
-	/* ========= Kinect: create KinectSensor instance ========= */
-	// Instantiate KinectBase
-//>>>	m_pKinect = new KinectBase();
-
-	// Create KinectSensor instance for the first connected sensor
+	/* ========= Kinect: Create KinectSensor instance for the first connected sensor ========== */
 	CreateFirstConnected();
-	/* ========= End of Kinect: create KinectSensor instance ========= */
+	/* ========= End of Kinect: Create KinectSensor instance for the first connected sensor === */
 
 
 	// Set the scene's ambient light
@@ -58,7 +54,7 @@ void Ogre3D::createScene(void)
 	m_pHead = mSceneMgr->createEntity("Head", "cube.mesh");
 	m_pSkeletonNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("HeadNode");
 	m_pSkeletonNode->attachObject(m_pHead);
-	m_pSkeletonNode->setScale(0.05f, 0.05f, 0.05f);
+	m_pSkeletonNode->setScale(0.1f, 0.1f, 0.1f);
 
 /*
 	m_pShoulderCenter = mSceneMgr->createEntity("ShoulderCenter", "cube.mesh");
@@ -376,6 +372,8 @@ void Ogre3D::ProcessSkeleton()
         }
         else if (NUI_SKELETON_POSITION_ONLY == trackingState)
         {
+			// Draw it anyway
+			DrawSkeleton(skeletonFrame.SkeletonData[i]);
 /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             // we've only received the center point of the skeleton, draw that
             D2D1_ELLIPSE ellipse = D2D1::Ellipse(
@@ -483,7 +481,7 @@ void Ogre3D::DrawSkeleton(const NUI_SKELETON_DATA & skel)
     {
 		m_pSkeletonNode->setPosition(m_Points[0]);
     }
-	else if ( skel.eSkeletonPositionTrackingState[i] == NUI_SKELETON_POSITION_TRACKED )
+	else if ( skel.eSkeletonPositionTrackingState[0] == NUI_SKELETON_POSITION_TRACKED )
     {
 		m_pSkeletonNode->setPosition(m_Points[0]);
     }
@@ -514,7 +512,7 @@ Ogre::Vector3 Ogre3D::SkeletonToVector(Vector4 skeletonPoint)
     // NuiTransformSkeletonToDepthImage returns coordinates in NUI_IMAGE_RESOLUTION_320x240 space
     NuiTransformSkeletonToDepthImage(skeletonPoint, &x, &y);
 
-    Ogre::Vector3 position = Ogre::Vector3(x+10, y+10, -50.0f);
+    Ogre::Vector3 position = Ogre::Vector3(x, y, 50.0f);
 
     return position;
 }

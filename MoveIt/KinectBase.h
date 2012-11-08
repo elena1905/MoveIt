@@ -10,6 +10,8 @@
 
 #include "resource.h"
 #include "NuiApi.h"
+#include "OgreVector3.h"
+//#include "Ogre3D.h"
 //#include "nuiimagecamera.h"
 //#include "NuiSkeleton.h"
 
@@ -79,7 +81,7 @@ private:
     ID2D1SolidColorBrush*    m_pBrushBoneTracked;
     ID2D1SolidColorBrush*    m_pBrushBoneInferred;
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
-//>>>    D2D1_POINT_2F            m_Points[NUI_SKELETON_POSITION_COUNT];
+    Ogre::Vector3            m_Points[NUI_SKELETON_POSITION_COUNT];
 
 
 /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -127,6 +129,7 @@ private:
     /// <param name="joint0">joint to start drawing from</param>
     /// <param name="joint1">joint to end drawing at</param>
     void                    DrawBone(const NUI_SKELETON_DATA & skel, NUI_SKELETON_POSITION_INDEX bone0, NUI_SKELETON_POSITION_INDEX bone1);
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 
     /// <summary>
     /// Draws a skeleton
@@ -134,12 +137,14 @@ private:
     /// <param name="skel">skeleton to draw</param>
     /// <param name="windowWidth">width (in pixels) of output buffer</param>
     /// <param name="windowHeight">height (in pixels) of output buffer</param>
-    void                    DrawSkeleton(const NUI_SKELETON_DATA & skel, int windowWidth, int windowHeight);
+    void                    DrawSkeleton(const NUI_SKELETON_DATA & skel);
 
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/// <summary>
     /// Draws a point
     /// </summary>
     //void                    DrawPoint(const NUI_COLOR_IMAGE_POINT & point);
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 
     /// <summary>
     /// Converts a skeleton point to screen space
@@ -148,9 +153,9 @@ private:
     /// <param name="width">width (in pixels) of output buffer</param>
     /// <param name="height">height (in pixels) of output buffer</param>
     /// <returns>point in screen-space</returns>
-    D2D1_POINT_2F           SkeletonToScreen(Vector4 skeletonPoint, int width, int height);
+    Ogre::Vector3           SkeletonToVector(Vector4 skeletonPoint);
 
-
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     /// <summary>
     /// Set the status bar message
     /// </summary>

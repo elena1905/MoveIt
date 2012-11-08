@@ -93,13 +93,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GameApp.cpp" />
-    <ClCompile Include="KinectBase.cpp" />
     <ClCompile Include="Ogre3D.cpp" />
     <ClCompile Include="Ogre3DBase.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameApp.h" />
-    <ClInclude Include="KinectBase.h" />
     <ClInclude Include="Ogre3D.h" />
     <ClInclude Include="Ogre3DBase.h" />
     <ClInclude Include="resource.h" />

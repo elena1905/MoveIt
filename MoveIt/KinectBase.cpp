@@ -343,6 +343,7 @@ void KinectBase::ProcessSkeleton()
     GetClientRect( GetDlgItem( m_hWnd, IDC_VIDEOVIEW ), &rct);
     int width = rct.right;
     int height = rct.bottom;
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 
     for (int i = 0 ; i < NUI_SKELETON_COUNT; ++i)
     {
@@ -351,10 +352,11 @@ void KinectBase::ProcessSkeleton()
         if (NUI_SKELETON_TRACKED == trackingState)
         {
             // We're tracking the skeleton, draw it
-            DrawSkeleton(skeletonFrame.SkeletonData[i], width, height);
+            DrawSkeleton(skeletonFrame.SkeletonData[i]);
         }
         else if (NUI_SKELETON_POSITION_ONLY == trackingState)
         {
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             // we've only received the center point of the skeleton, draw that
             D2D1_ELLIPSE ellipse = D2D1::Ellipse(
                 SkeletonToScreen(skeletonFrame.SkeletonData[i].Position, width, height),
@@ -363,9 +365,11 @@ void KinectBase::ProcessSkeleton()
                 );
 
             m_pRenderTarget->DrawEllipse(ellipse, m_pBrushJointTracked);
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
         }
     }
 
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	// Draw a new ramdon circle when old circle touched
 	float posX = m_Points[7].x;
 	float posY = m_Points[7].y;
@@ -413,22 +417,22 @@ void KinectBase::ProcessSkeleton()
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 }
 
-/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 /// <summary>
 /// Draws a skeleton
 /// </summary>
 /// <param name="skel">skeleton to draw</param>
 /// <param name="windowWidth">width (in pixels) of output buffer</param>
 /// <param name="windowHeight">height (in pixels) of output buffer</param>
-void KinectBase::DrawSkeleton(const NUI_SKELETON_DATA & skel, int windowWidth, int windowHeight)
+void KinectBase::DrawSkeleton(const NUI_SKELETON_DATA & skel)
 {      
     int i;
 
     for (i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i)
     {
-        m_Points[i] = SkeletonToScreen(skel.SkeletonPositions[i], windowWidth, windowHeight);
+        m_Points[i] = SkeletonToVector(skel.SkeletonPositions[i]);
     }
 
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     // Render Torso
     DrawBone(skel, NUI_SKELETON_POSITION_HEAD, NUI_SKELETON_POSITION_SHOULDER_CENTER);
     DrawBone(skel, NUI_SKELETON_POSITION_SHOULDER_CENTER, NUI_SKELETON_POSITION_SHOULDER_LEFT);
@@ -457,23 +461,37 @@ void KinectBase::DrawSkeleton(const NUI_SKELETON_DATA & skel, int windowWidth, i
     DrawBone(skel, NUI_SKELETON_POSITION_HIP_RIGHT, NUI_SKELETON_POSITION_KNEE_RIGHT);
     DrawBone(skel, NUI_SKELETON_POSITION_KNEE_RIGHT, NUI_SKELETON_POSITION_ANKLE_RIGHT);
     DrawBone(skel, NUI_SKELETON_POSITION_ANKLE_RIGHT, NUI_SKELETON_POSITION_FOOT_RIGHT);
-    
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
+
     // Draw the joints in a different color
+//>>>	extern Ogre::SceneNode* m_pSkeletonNode;
+	if ( skel.eSkeletonPositionTrackingState[0] == NUI_SKELETON_POSITION_INFERRED )
+    {
+//>>>		m_pSkeletonNode->setPosition(m_Points[0]);
+    }
+	else if ( skel.eSkeletonPositionTrackingState[i] == NUI_SKELETON_POSITION_TRACKED )
+    {
+//>>>		m_pSkeletonNode->setPosition(m_Points[0]);
+    }
+/*
     for (i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i)
     {
-        D2D1_ELLIPSE ellipse = D2D1::Ellipse( m_Points[i], g_JointThickness, g_JointThickness );
+//>>>        D2D1_ELLIPSE ellipse = D2D1::Ellipse( m_Points[i], g_JointThickness, g_JointThickness );
 
         if ( skel.eSkeletonPositionTrackingState[i] == NUI_SKELETON_POSITION_INFERRED )
         {
-            m_pRenderTarget->DrawEllipse(ellipse, m_pBrushJointInferred);
+//>>>            m_pRenderTarget->DrawEllipse(ellipse, m_pBrushJointInferred);
+			m_pSkeletonNode->setPostition(m_Points[i]);
         }
         else if ( skel.eSkeletonPositionTrackingState[i] == NUI_SKELETON_POSITION_TRACKED )
         {
-            m_pRenderTarget->DrawEllipse(ellipse, m_pBrushJointTracked);
+//>>>            m_pRenderTarget->DrawEllipse(ellipse, m_pBrushJointTracked);
         }
     }
+*/
 }
 
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 /// <summary>
 /// Draws a bone line between two joints
 /// </summary>
@@ -507,6 +525,7 @@ void KinectBase::DrawBone(const NUI_SKELETON_DATA & skel, NUI_SKELETON_POSITION_
         m_pRenderTarget->DrawLine(m_Points[joint0], m_Points[joint1], m_pBrushBoneInferred, g_InferredBoneThickness);
     }
 }
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 
 /// <summary>
 /// Converts a skeleton point to screen space
@@ -515,21 +534,20 @@ void KinectBase::DrawBone(const NUI_SKELETON_DATA & skel, NUI_SKELETON_POSITION_
 /// <param name="width">width (in pixels) of output buffer</param>
 /// <param name="height">height (in pixels) of output buffer</param>
 /// <returns>point in screen-space</returns>
-D2D1_POINT_2F KinectBase::SkeletonToScreen(Vector4 skeletonPoint, int width, int height)
+Ogre::Vector3 KinectBase::SkeletonToVector(Vector4 skeletonPoint)
 {
-    LONG x, y;
-    USHORT depth;
+    FLOAT x, y;
 
     // Calculate the skeleton's position on the screen
     // NuiTransformSkeletonToDepthImage returns coordinates in NUI_IMAGE_RESOLUTION_320x240 space
-    NuiTransformSkeletonToDepthImage(skeletonPoint, &x, &y, &depth);
+    NuiTransformSkeletonToDepthImage(skeletonPoint, &x, &y);
 
-    float screenPointX = static_cast<float>(x * width) / cScreenWidth;
-    float screenPointY = static_cast<float>(y * height) / cScreenHeight;
+    Ogre::Vector3 position = Ogre::Vector3(x, y, -100.0f);
 
-    return D2D1::Point2F(screenPointX, screenPointY);
+    return position;
 }
 
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 /// <summary>
 /// Ensure necessary Direct2d resources are created
 /// </summary>

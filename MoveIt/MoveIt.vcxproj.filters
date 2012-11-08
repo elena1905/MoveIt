@@ -24,9 +24,6 @@
     <ClCompile Include="Ogre3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="KinectBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameApp.h">
@@ -42,9 +39,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="KinectBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

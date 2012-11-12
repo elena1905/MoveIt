@@ -45,6 +45,14 @@ protected:
     Ogre::Real mWalkSpeed;                 // The speed at which the object is moving
 
 	/* Skeleton Entities and skeleton SceneNode */
+	Ogre::SceneNode* m_pPlayerNode;
+	Ogre::Entity* m_pPlayer;
+
+
+	// Test joints
+	Ogre::SkeletonInstance* m_pSkeleton;
+	Ogre::Bone* m_pBones;
+
 	Ogre::SceneNode* m_pSkeletonNode;
 
 	Ogre::Entity* m_pHead;

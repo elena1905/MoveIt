@@ -51,11 +51,22 @@ void Ogre3D::createScene(void)
 
 
 	/* =========== Kinect: create skeleton entities and attach them to skeletonNode ========== */
+	m_pPlayer = mSceneMgr->createEntity("Player", "robot.mesh");
+	m_pPlayer->setCastShadows(true);
+	m_pPlayerNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("PlayerNode", Ogre::Vector3(0.0f, 0.0f, 0.0f));
+	m_pPlayerNode->attachObject(m_pPlayer);
+//>>>	m_pPlayerNode->setScale(0.08f, 0.08f, 0.08f);
+
+	m_pSkeleton = m_pPlayer->getSkeleton();
+	m_pBones = m_pSkeleton->getBone("Joint1");
+	
+
+	// Test: moving a cube along with the movement of player's head
 	m_pHead = mSceneMgr->createEntity("Head", "cube.mesh");
 	m_pSkeletonNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("HeadNode");
 	m_pSkeletonNode->attachObject(m_pHead);
 	m_pSkeletonNode->setScale(0.1f, 0.1f, 0.1f);
-
+	
 /*
 	m_pShoulderCenter = mSceneMgr->createEntity("ShoulderCenter", "cube.mesh");
 	m_pShoulderLeft = mSceneMgr->createEntity("ShoulderLeft", "cube.mesh");
@@ -153,7 +164,7 @@ void Ogre3D::createCamera(void)
 	mCamera = mSceneMgr->createCamera("PlayerCam");
 
 	// Set the Camera's position and direction
-	mCamera->setPosition(Ogre::Vector3(0, 10, 500));
+	mCamera->setPosition(Ogre::Vector3(0, 30, 300));
 	mCamera->lookAt(Ogre::Vector3(0, 0, 0));
 
 	// Set the near clip distance
@@ -212,8 +223,44 @@ bool Ogre3D::nextLocation(void)
 //-------------------------------------------------------------------------------------
 bool Ogre3D::frameRenderingQueued(const Ogre::FrameEvent &evt)
 {
-	ProcessSkeleton();
+	// Make the character look at the camera
+	Ogre::Vector3 posPlayer = m_pPlayerNode->getPosition();
+	Ogre::Vector3 posCamera = mCamera->getPosition();
 
+	Ogre::Vector3 toCamera = posPlayer - posCamera;
+	toCamera.normalise();
+
+	Ogre::Vector3 basis = Ogre::Vector3(0.0f, 0.0f, -1.0f);
+
+	// Rotation angle
+	Ogre::Radian rotAngle = Ogre::Radian();
+	
+	if (m_pPlayerNode->getOrientation().x < 0)
+	{
+		rotAngle = Ogre::Math().ACos(basis.dotProduct(toCamera));
+	}
+	else
+	{
+		rotAngle = -Ogre::Math().ACos(basis.dotProduct(toCamera));
+	}
+
+	Ogre::Quaternion quaPlayer;
+	quaPlayer.FromAngleAxis(rotAngle, Ogre::Vector3::UNIT_Y);
+	
+	Ogre::Vector3 finalDirec;
+	finalDirec.x = m_pPlayerNode->getOrientation().x;
+	finalDirec.y = m_pPlayerNode->getOrientation().y;
+	finalDirec.z = m_pPlayerNode->getOrientation().z;
+	m_pPlayerNode->setDirection(quaPlayer * finalDirec);
+
+
+
+	/* === Kinect: process skeleton streams and draw the cube according to player's position === */
+	ProcessSkeleton();
+	/* === End of Kinect: process skeleton streams and draw the cube according to player's position === */
+
+
+	// Move a cube between two knots
 	if (mDirection == Ogre::Vector3::ZERO)
 	{
 		if (nextLocation())
@@ -480,10 +527,12 @@ void Ogre3D::DrawSkeleton(const NUI_SKELETON_DATA & skel)
 	if ( skel.eSkeletonPositionTrackingState[0] == NUI_SKELETON_POSITION_INFERRED )
     {
 		m_pSkeletonNode->setPosition(m_Points[0]);
+		m_pBones->setPosition(m_Points[0]);
     }
 	else if ( skel.eSkeletonPositionTrackingState[0] == NUI_SKELETON_POSITION_TRACKED )
     {
 		m_pSkeletonNode->setPosition(m_Points[0]);
+		m_pBones->setPosition(m_Points[0]);
     }
 /*
     for (i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i)

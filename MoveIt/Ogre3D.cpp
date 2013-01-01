@@ -57,30 +57,24 @@ void Ogre3D::createScene(void)
 	m_pPlayerNode->attachObject(m_pPlayer);
 //>>>	m_pPlayerNode->setScale(0.08f, 0.08f, 0.08f);
 
+	// Rotate the player model to face the camera
+	Ogre::Quaternion q;
+	Ogre::Math pi;
+	q.FromAngleAxis(Ogre::Radian(-pi.PI / 2), Ogre::Vector3(0, 1, 0));
+	m_pPlayerNode->rotate(q);
+
 	m_pSkeleton = m_pPlayer->getSkeleton();
 	m_pBones = m_pSkeleton->getBone("Joint1");
+	m_pBones->setManuallyControlled(true);
+	
 	
 
 	// Test: moving a cube along with the movement of player's head
 	m_pHead = mSceneMgr->createEntity("Head", "cube.mesh");
 	m_pSkeletonNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("HeadNode");
-	m_pSkeletonNode->attachObject(m_pHead);
+	//m_pSkeletonNode->attachObject(m_pHead);
 	m_pSkeletonNode->setScale(0.1f, 0.1f, 0.1f);
-	
-/*
-	m_pShoulderCenter = mSceneMgr->createEntity("ShoulderCenter", "cube.mesh");
-	m_pShoulderLeft = mSceneMgr->createEntity("ShoulderLeft", "cube.mesh");
-	m_pShoulderRight = mSceneMgr->createEntity("ShoulderRight", "cube.mesh");
-	m_pSpine = mSceneMgr->createEntity("Spine", "cube.mesh");
-	m_pHipCenter = mSceneMgr->createEntity("HipCenter", "cube.mesh");
-	m_pHipLeft = mSceneMgr->createEntity("HipLeft", "cube.mesh");
-	m_pHipRight = mSceneMgr->createEntity("HipRight", "cube.mesh");
-	m_pKneeLeft = mSceneMgr->createEntity("KneeLeft", "cube.mesh");
-	m_pKneeRight = mSceneMgr->createEntity("KneeRight", "cube.mesh");
-	m_pAnkleLeft = mSceneMgr->createEntity("AnkleLeft", "cube.mesh");
-	m_pAnkleRight = mSceneMgr->createEntity("AnkleRight", "cube.mesh");
-*/
-	/* =========== Kinect: create skeleton entities and attach them to skeletonNode ========== */
+	/* =========== End of Kinect: create skeleton entities and attach them to skeletonNode ========== */
 
 
 	/* =========== Test: move a cube between two knots ========== */
@@ -95,31 +89,12 @@ void Ogre3D::createScene(void)
 	// Create the walking list
     mWalkList.push_back(Ogre::Vector3(550.0f, 10.0f, 50.0f ));
     mWalkList.push_back(Ogre::Vector3(-100.0f, 10.0f, -200.0f));
-
-    // Create objects so we can see movement
-    Ogre::Entity *ent;
-    Ogre::SceneNode *node;
-
-    ent = mSceneMgr->createEntity("Knot1", "knot.mesh");
-    node = mSceneMgr->getRootSceneNode()->createChildSceneNode("Knot1Node", Ogre::Vector3(0.0f, 10.0f, 25.0f));
-    node->attachObject(ent);
-    node->setScale(0.1f, 0.1f, 0.1f);
-
-    ent = mSceneMgr->createEntity("Knot2", "knot.mesh");
-    node = mSceneMgr->getRootSceneNode()->createChildSceneNode("Knot2Node", Ogre::Vector3(550.0f, 10.0f, 50.0f));
-    node->attachObject(ent);
-    node->setScale(0.1f, 0.1f, 0.1f);
-
-    ent = mSceneMgr->createEntity("Knot3", "knot.mesh");
-    node = mSceneMgr->getRootSceneNode()->createChildSceneNode("Knot3Node", Ogre::Vector3(-100.0f, 10.0f, -200.0f));
-    node->attachObject(ent);
-    node->setScale(0.1f, 0.1f, 0.1f);
 	/* =========== End of Test: move a cube between two knots ========== */
 
 
 	// Create a plane
     Ogre::Plane plane(Ogre::Vector3::UNIT_Y, 0);
-
+	
 	// Register the plane
 	Ogre::MeshManager::getSingleton().createPlane("ground", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
 		plane, 1500, 1500, 20, 20, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
@@ -136,7 +111,7 @@ void Ogre3D::createScene(void)
 	Ogre::Light* pointLight = mSceneMgr->createLight("pointLight");
 	pointLight->setType(Ogre::Light::LT_POINT);
 	pointLight->setPosition(Ogre::Vector3(0, 150, 250));
-	pointLight->setDiffuseColour(1.0, 0.0, 0.0);
+	pointLight->setDiffuseColour(1.0, 1.0, 1.0);
 	pointLight->setSpecularColour(1.0, 0.0, 0.0);
 
 	// Create the light, set its type directional and direction, set diffuse and specular colour to yellow
@@ -164,8 +139,8 @@ void Ogre3D::createCamera(void)
 	mCamera = mSceneMgr->createCamera("PlayerCam");
 
 	// Set the Camera's position and direction
-	mCamera->setPosition(Ogre::Vector3(0, 30, 300));
-	mCamera->lookAt(Ogre::Vector3(0, 0, 0));
+	mCamera->setPosition(Ogre::Vector3(0, 50, 200));
+	mCamera->lookAt(Ogre::Vector3(0, 20, 0));
 
 	// Set the near clip distance
 	mCamera->setNearClipDistance(5);
@@ -223,6 +198,7 @@ bool Ogre3D::nextLocation(void)
 //-------------------------------------------------------------------------------------
 bool Ogre3D::frameRenderingQueued(const Ogre::FrameEvent &evt)
 {
+	/*
 	// Make the character look at the camera
 	Ogre::Vector3 posPlayer = m_pPlayerNode->getPosition();
 	Ogre::Vector3 posCamera = mCamera->getPosition();
@@ -252,8 +228,10 @@ bool Ogre3D::frameRenderingQueued(const Ogre::FrameEvent &evt)
 	finalDirec.y = m_pPlayerNode->getOrientation().y;
 	finalDirec.z = m_pPlayerNode->getOrientation().z;
 	m_pPlayerNode->setDirection(quaPlayer * finalDirec);
-
-
+	*/
+	//Ogre::Vector3* targetPos = new Ogre::Vector3(0.0f, 30.0f, 300.0f);
+	//m_pPlayerNode->lookAt(Ogre::Vector3(0.0f, 30.0f, 300.0f), Ogre::Node::TransformSpace::TS_WORLD);
+	
 
 	/* === Kinect: process skeleton streams and draw the cube according to player's position === */
 	ProcessSkeleton();
@@ -527,12 +505,12 @@ void Ogre3D::DrawSkeleton(const NUI_SKELETON_DATA & skel)
 	if ( skel.eSkeletonPositionTrackingState[0] == NUI_SKELETON_POSITION_INFERRED )
     {
 		m_pSkeletonNode->setPosition(m_Points[0]);
-		m_pBones->setPosition(m_Points[0]);
+//>>>		m_pBones->setPosition(m_Points[0]);
     }
 	else if ( skel.eSkeletonPositionTrackingState[0] == NUI_SKELETON_POSITION_TRACKED )
     {
 		m_pSkeletonNode->setPosition(m_Points[0]);
-		m_pBones->setPosition(m_Points[0]);
+//>>>		m_pBones->setPosition(m_Points[0]);
     }
 /*
     for (i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i)
@@ -560,6 +538,10 @@ Ogre::Vector3 Ogre3D::SkeletonToVector(Vector4 skeletonPoint)
     // Calculate the skeleton's position on the screen
     // NuiTransformSkeletonToDepthImage returns coordinates in NUI_IMAGE_RESOLUTION_320x240 space
     NuiTransformSkeletonToDepthImage(skeletonPoint, &x, &y);
+
+	Ogre::Viewport* viewPort = mWindow->getViewport(0);
+	x = (x * viewPort->getActualWidth()) / 320.0f;
+	y = (y * viewPort->getActualHeight()) / 240.0f;
 
     Ogre::Vector3 position = Ogre::Vector3(x, y, 50.0f);
 

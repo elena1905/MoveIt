@@ -29,8 +29,6 @@ protected:
 	virtual void createFrameListener(void); 
     virtual bool frameRenderingQueued(const Ogre::FrameEvent &evt);
     virtual bool nextLocation(void);
-	
-//>>>	KinectBase* m_pKinect;				   // Kinect instance
 
 	Ogre::Real mDistance;                  // The distance the object has left to travel
     Ogre::Vector3 mDirection;              // The direction the object is moving
@@ -54,24 +52,7 @@ protected:
 	Ogre::Bone* m_pBones;
 
 	Ogre::SceneNode* m_pSkeletonNode;
-
 	Ogre::Entity* m_pHead;
-
-	Ogre::Entity* m_pShoulderCenter;
-	Ogre::Entity* m_pShoulderLeft;
-	Ogre::Entity* m_pShoulderRight;
-
-	Ogre::Entity* m_pSpine;
-
-	Ogre::Entity* m_pHipCenter;
-	Ogre::Entity* m_pHipLeft;
-	Ogre::Entity* m_pHipRight;
-
-	Ogre::Entity* m_pKneeLeft;
-	Ogre::Entity* m_pKneeRight;
-
-	Ogre::Entity* m_pAnkleLeft;
-	Ogre::Entity* m_pAnkleRight;
 
 	/* Kinect Members and Methods */
 	bool                    m_bSeatedMode;

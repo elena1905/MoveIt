@@ -42,9 +42,13 @@ void Ogre3D::createScene(void)
 	CreateFirstConnected();
 	/* ========= End of Kinect: Create KinectSensor instance for the first connected sensor === */
 
+	for (int i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i)
+	{
+		m_Points[i] = Ogre::Vector3(0, 0, 0);
+	}
 
 	// Set the scene's ambient light
-	mSceneMgr->setAmbientLight(Ogre::ColourValue(0, 0, 0));
+	mSceneMgr->setAmbientLight(Ogre::ColourValue(1.0f, 1.0f, 1.0f));
 
 	// Set shadow type
 	mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
@@ -64,8 +68,11 @@ void Ogre3D::createScene(void)
 	m_pPlayerNode->rotate(q);
 
 	m_pSkeleton = m_pPlayer->getSkeleton();
-	m_pBones = m_pSkeleton->getBone("Joint1");
+//>>>	m_pBones = m_pSkeleton->getRootBone();
+	m_pBones = m_pSkeleton->getBone("Joint17");
 	m_pBones->setManuallyControlled(true);
+//>>>	m_pBones2 = m_pSkeleton->getBone("Joint4");
+//>>>	m_pBones2->setManuallyControlled(true);
 	
 	
 
@@ -106,30 +113,6 @@ void Ogre3D::createScene(void)
 	// Set the texture of entGround; Do not cast shadows on it
 	entGround->setMaterialName("Examples/Rockwall");
 	entGround->setCastShadows(false);
-
-	// Create the light, set its type point and position, set diffuse and specular colour to red
-	Ogre::Light* pointLight = mSceneMgr->createLight("pointLight");
-	pointLight->setType(Ogre::Light::LT_POINT);
-	pointLight->setPosition(Ogre::Vector3(0, 150, 250));
-	pointLight->setDiffuseColour(1.0, 1.0, 1.0);
-	pointLight->setSpecularColour(1.0, 0.0, 0.0);
-
-	// Create the light, set its type directional and direction, set diffuse and specular colour to yellow
-	Ogre::Light* directionalLight = mSceneMgr->createLight("directionalLight");
-	directionalLight->setType(Ogre::Light::LT_DIRECTIONAL);
-	directionalLight->setDirection(Ogre::Vector3(0, -1, 1));
-	directionalLight->setDiffuseColour(Ogre::ColourValue(0.25, 0.25, 0.0));
-	directionalLight->setSpecularColour(Ogre::ColourValue(0.25, 0.25, 0.0));
-
-	// Create the light, set its type spotlight, position, direction and light range,
-	// set diffuse and specular colour blue
-	Ogre::Light* spotLight = mSceneMgr->createLight("spotLight");
-	spotLight->setType(Ogre::Light::LT_SPOTLIGHT);
-	spotLight->setDirection(Ogre::Vector3(-1, -1, 0));
-	spotLight->setPosition(Ogre::Vector3(300, 300, 0));
-	spotLight->setSpotlightRange(Ogre::Degree(35), Ogre::Degree(50));
-	spotLight->setDiffuseColour(0, 0, 1.0);
-	spotLight->setSpecularColour(0, 0, 1.0);
 }
 
 //-------------------------------------------------------------------------------------
@@ -171,13 +154,6 @@ void Ogre3D::createViewports(void)
 void Ogre3D::createFrameListener(void)
 {
     Ogre3DBase::createFrameListener();
-    
-	/*
-	// Set idle animation
-    mAnimationState = mEntity->getAnimationState("Idle");
-    mAnimationState->setLoop(true);
-    mAnimationState->setEnabled(true);
-	*/
 
     // Set default values for variables
     mWalkSpeed = 35.0f;
@@ -237,18 +213,13 @@ bool Ogre3D::frameRenderingQueued(const Ogre::FrameEvent &evt)
 	ProcessSkeleton();
 	/* === End of Kinect: process skeleton streams and draw the cube according to player's position === */
 
+//>>>	m_pBones->yaw(Ogre::Degree(evt.timeSinceLastFrame*100));
 
 	// Move a cube between two knots
 	if (mDirection == Ogre::Vector3::ZERO)
 	{
 		if (nextLocation())
 		{
-			/*
-			// Set walking animation
-			mAnimationState = mEntity->getAnimationState("Walk");
-			mAnimationState->setLoop(true);
-			mAnimationState->setEnabled(true);
-			*/
 		}//if
 	}
 	else
@@ -262,12 +233,6 @@ bool Ogre3D::frameRenderingQueued(const Ogre::FrameEvent &evt)
 			// Set animation based on if the robot has another point to walk to. 
 			if (!nextLocation())
 			{
-				/*
-				// Set Idle animation                     
-				mAnimationState = mEntity->getAnimationState("Idle");
-				mAnimationState->setLoop(true);
-				mAnimationState->setEnabled(true);
-				*/
 			}
 			else
 			{
@@ -289,10 +254,6 @@ bool Ogre3D::frameRenderingQueued(const Ogre::FrameEvent &evt)
 			mNode->translate(mDirection * move);
 		} // else
 	} // if
-	
-	/*
-	mAnimationState->addTime(evt.timeSinceLastFrame);
-	*/
 
 	return Ogre3DBase::frameRenderingQueued(evt);
 }
@@ -369,23 +330,6 @@ void Ogre3D::ProcessSkeleton()
     // smooth out the skeleton data
     m_pNuiSensor->NuiTransformSmooth(&skeletonFrame, NULL);
 
-/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    // Endure Direct2D is ready to draw
-    hr = EnsureDirect2DResources( );
-    if ( FAILED(hr) )
-    {
-        return;
-    }
-
-    m_pRenderTarget->BeginDraw();
-    m_pRenderTarget->Clear( );
-    
-    RECT rct;
-    GetClientRect( GetDlgItem( m_hWnd, IDC_VIDEOVIEW ), &rct);
-    int width = rct.right;
-    int height = rct.bottom;
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
-
     for (int i = 0 ; i < NUI_SKELETON_COUNT; ++i)
     {
         NUI_SKELETON_TRACKING_STATE trackingState = skeletonFrame.SkeletonData[i].eTrackingState;
@@ -399,65 +343,8 @@ void Ogre3D::ProcessSkeleton()
         {
 			// Draw it anyway
 			DrawSkeleton(skeletonFrame.SkeletonData[i]);
-/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            // we've only received the center point of the skeleton, draw that
-            D2D1_ELLIPSE ellipse = D2D1::Ellipse(
-                SkeletonToScreen(skeletonFrame.SkeletonData[i].Position, width, height),
-                g_JointThickness,
-                g_JointThickness
-                );
-
-            m_pRenderTarget->DrawEllipse(ellipse, m_pBrushJointTracked);
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
         }
     }
-
-/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-	// Draw a new ramdon circle when old circle touched
-	float posX = m_Points[7].x;
-	float posY = m_Points[7].y;
-
-	srand((unsigned)time(NULL));
-	float randX = 200.0f;
-	float randY = 200.0f;
-
-	// Draw a circle
-	D2D1_POINT_2F circle = {randX, randY};
-	D2D1_ELLIPSE myEllipse = D2D1::Ellipse(circle, 12.0f, 16.0f);
-	m_pRenderTarget->DrawEllipse(myEllipse, m_pBrushJointTracked);
-
-	//D2D1_ELLIPSE myEllipse;
-	//if ((posX > (randX - 20)) && (posX < (randX + 20)) && (posY > (randY - 20)) && (posY < (randY + 20)))
-	if (posX > 180 && posX < 220 && posY > 180 && posY < 220)
-	{
-		randX = rand() % 300 + 20.0f;
-		randY = rand() % 300 + 20.0f;
-		D2D1_POINT_2F randCircle = {randX, randY};
-		D2D1_ELLIPSE newEllipse = D2D1::Ellipse(randCircle, 12.0f, 16.0f);
-
-		m_pRenderTarget->DrawEllipse(newEllipse, m_pBrushJointTracked);
-		
-		/*ColeDateTime start_time = ColeDateTime::GetCurrentTime();
-		ColeDateTimeSpan end_time = ColeDateTime::GetCurrentTime() - start_time;
-		while (end_time.GetTotalSeconds() <= 2)
-		{
-			m_pRenderTarget->DrawEllipse(myEllipse, m_pBrushJointTracked);
-			end_time = ColeDateTime::GetCurrentTime-start_time;
-		}*/
-/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-	}
-	//m_pRenderTarget->DrawEllipse(myEllipse, m_pBrushJointTracked);
-
-    hr = m_pRenderTarget->EndDraw();
-
-    // Device lost, need to recreate the render target
-    // We'll dispose it now and retry drawing
-    if (D2DERR_RECREATE_TARGET == hr)
-    {
-        hr = S_OK;
-        DiscardDirect2DResources();
-    }
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 }
 
 
@@ -467,67 +354,41 @@ void Ogre3D::DrawSkeleton(const NUI_SKELETON_DATA & skel)
 
     for (i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i)
     {
+		m_PointsOld[i] = m_Points[i];
         m_Points[i] = SkeletonToVector(skel.SkeletonPositions[i]);
     }
-
-/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    // Render Torso
-    DrawBone(skel, NUI_SKELETON_POSITION_HEAD, NUI_SKELETON_POSITION_SHOULDER_CENTER);
-    DrawBone(skel, NUI_SKELETON_POSITION_SHOULDER_CENTER, NUI_SKELETON_POSITION_SHOULDER_LEFT);
-    DrawBone(skel, NUI_SKELETON_POSITION_SHOULDER_CENTER, NUI_SKELETON_POSITION_SHOULDER_RIGHT);
-    DrawBone(skel, NUI_SKELETON_POSITION_SHOULDER_CENTER, NUI_SKELETON_POSITION_SPINE);
-    DrawBone(skel, NUI_SKELETON_POSITION_SPINE, NUI_SKELETON_POSITION_HIP_CENTER);
-    DrawBone(skel, NUI_SKELETON_POSITION_HIP_CENTER, NUI_SKELETON_POSITION_HIP_LEFT);
-    DrawBone(skel, NUI_SKELETON_POSITION_HIP_CENTER, NUI_SKELETON_POSITION_HIP_RIGHT);
-
-    // Left Arm
-    DrawBone(skel, NUI_SKELETON_POSITION_SHOULDER_LEFT, NUI_SKELETON_POSITION_ELBOW_LEFT);
-    DrawBone(skel, NUI_SKELETON_POSITION_ELBOW_LEFT, NUI_SKELETON_POSITION_WRIST_LEFT);
-    DrawBone(skel, NUI_SKELETON_POSITION_WRIST_LEFT, NUI_SKELETON_POSITION_HAND_LEFT);
-
-    // Right Arm
-    DrawBone(skel, NUI_SKELETON_POSITION_SHOULDER_RIGHT, NUI_SKELETON_POSITION_ELBOW_RIGHT);
-    DrawBone(skel, NUI_SKELETON_POSITION_ELBOW_RIGHT, NUI_SKELETON_POSITION_WRIST_RIGHT);
-    DrawBone(skel, NUI_SKELETON_POSITION_WRIST_RIGHT, NUI_SKELETON_POSITION_HAND_RIGHT);
-
-    // Left Leg
-    DrawBone(skel, NUI_SKELETON_POSITION_HIP_LEFT, NUI_SKELETON_POSITION_KNEE_LEFT);
-    DrawBone(skel, NUI_SKELETON_POSITION_KNEE_LEFT, NUI_SKELETON_POSITION_ANKLE_LEFT);
-    DrawBone(skel, NUI_SKELETON_POSITION_ANKLE_LEFT, NUI_SKELETON_POSITION_FOOT_LEFT);
-
-    // Right Leg
-    DrawBone(skel, NUI_SKELETON_POSITION_HIP_RIGHT, NUI_SKELETON_POSITION_KNEE_RIGHT);
-    DrawBone(skel, NUI_SKELETON_POSITION_KNEE_RIGHT, NUI_SKELETON_POSITION_ANKLE_RIGHT);
-    DrawBone(skel, NUI_SKELETON_POSITION_ANKLE_RIGHT, NUI_SKELETON_POSITION_FOOT_RIGHT);
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 
     // Draw the joints in a different color
 	if ( skel.eSkeletonPositionTrackingState[0] == NUI_SKELETON_POSITION_INFERRED )
     {
-		m_pSkeletonNode->setPosition(m_Points[0]);
-//>>>		m_pBones->setPosition(m_Points[0]);
+		Ogre::Vector3 oldArm = m_PointsOld[NUI_SKELETON_POSITION_WRIST_LEFT] - m_PointsOld[NUI_SKELETON_POSITION_SHOULDER_LEFT];
+		Ogre::Vector3 newArm = m_Points[NUI_SKELETON_POSITION_WRIST_LEFT] - m_Points[NUI_SKELETON_POSITION_SHOULDER_LEFT];
+		
+		oldArm.normalise();
+		newArm.normalise();
+
+		Ogre::Vector3 axis = oldArm.crossProduct(newArm);
+		Ogre::Math math;
+		Ogre::Radian angle = math.ACos(oldArm.dotProduct(newArm));
+
+		m_pBones->rotate(axis, angle);
     }
 	else if ( skel.eSkeletonPositionTrackingState[0] == NUI_SKELETON_POSITION_TRACKED )
     {
-		m_pSkeletonNode->setPosition(m_Points[0]);
+//>>>		m_pSkeletonNode->setPosition(m_Points[0]);
 //>>>		m_pBones->setPosition(m_Points[0]);
-    }
-/*
-    for (i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i)
-    {
-//>>>        D2D1_ELLIPSE ellipse = D2D1::Ellipse( m_Points[i], g_JointThickness, g_JointThickness );
+		Ogre::Vector3 oldArm = m_PointsOld[NUI_SKELETON_POSITION_WRIST_LEFT] - m_PointsOld[NUI_SKELETON_POSITION_SHOULDER_LEFT];
+		Ogre::Vector3 newArm = m_Points[NUI_SKELETON_POSITION_WRIST_LEFT] - m_Points[NUI_SKELETON_POSITION_SHOULDER_LEFT];
 
-        if ( skel.eSkeletonPositionTrackingState[i] == NUI_SKELETON_POSITION_INFERRED )
-        {
-//>>>            m_pRenderTarget->DrawEllipse(ellipse, m_pBrushJointInferred);
-			m_pSkeletonNode->setPostition(m_Points[i]);
-        }
-        else if ( skel.eSkeletonPositionTrackingState[i] == NUI_SKELETON_POSITION_TRACKED )
-        {
-//>>>            m_pRenderTarget->DrawEllipse(ellipse, m_pBrushJointTracked);
-        }
+		oldArm.normalise();
+		newArm.normalise();
+
+		Ogre::Vector3 axis = oldArm.crossProduct(newArm);
+		Ogre::Math math;
+		Ogre::Radian angle = math.ACos(oldArm.dotProduct(newArm));
+
+		m_pBones->rotate(axis, angle);
     }
-*/
 }
 
 

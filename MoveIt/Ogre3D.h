@@ -50,6 +50,7 @@ protected:
 	// Test joints
 	Ogre::SkeletonInstance* m_pSkeleton;
 	Ogre::Bone* m_pBones;
+	Ogre::Bone* m_pBones2;
 
 	Ogre::SceneNode* m_pSkeletonNode;
 	Ogre::Entity* m_pHead;
@@ -61,6 +62,7 @@ protected:
     INuiSensor*             m_pNuiSensor;
 
 	Ogre::Vector3            m_Points[NUI_SKELETON_POSITION_COUNT];
+	Ogre::Vector3            m_PointsOld[NUI_SKELETON_POSITION_COUNT];
 
 	HANDLE                  m_pSkeletonStreamHandle;
     HANDLE                  m_hNextSkeletonEvent;

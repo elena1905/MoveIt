@@ -14,6 +14,8 @@
 #include "resource.h"
 #include "NuiApi.h"
 //#include "KinectBase.h"
+#include <array>
+
 
 class Ogre3D : public Ogre3DBase
 {
@@ -32,6 +34,8 @@ protected:
 	Ogre::Entity* m_pPlayer;
 
 	// Ogre Skeleton and Bones
+	static const int ARR_SIZE = 8;
+	std::array<Ogre::Bone*, ARR_SIZE> m_BoneArray;
 	Ogre::SkeletonInstance* m_pSkeleton;
 	Ogre::Bone* m_pBones;
 

@@ -38,16 +38,11 @@ Ogre3D::~Ogre3D(void)
 //-------------------------------------------------------------------------------------
 void Ogre3D::createScene(void)
 {
-	/* ========= Kinect: Create KinectSensor instance for the first connected sensor ========== */
+	/* ========= Create KinectSensor instance for the first connected sensor ========== */
 	CreateFirstConnected();
 
 
-	// Initialize skeleton points
-	for (int i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i)
-	{
-		m_Points[i] = Ogre::Vector3(0, 0, 0);
-	}
-
+	/* ========= Set Light and Shadow Type ========== */
 	// Set the scene's ambient light
 	mSceneMgr->setAmbientLight(Ogre::ColourValue(1.0f, 1.0f, 1.0f));
 
@@ -55,13 +50,19 @@ void Ogre3D::createScene(void)
 	mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
 
 
-	/* =========== Kinect: create skeleton entities and attach them to skeletonNode ========== */
+	/* ========== Initialize skeleton points ========== */
+	for (int i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i)
+	{
+		m_Points[i] = Ogre::Vector3(0, 0, 0);
+	}
+
+
+	/* =========== Create skeleton entities and attach them to skeletonNode ========== */
 	m_pPlayer = mSceneMgr->createEntity("Player", "ninja.mesh");
 	m_pPlayer->setCastShadows(true);
 	m_pPlayerNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("PlayerNode", Ogre::Vector3(0.0f, 0.0f, 0.0f));
 	m_pPlayerNode->attachObject(m_pPlayer);
 	m_pPlayerNode->setScale(0.5f, 0.5f, 0.5f);
-
 
 	// Rotate the player model to face the camera
 	Ogre::Quaternion q;
@@ -73,10 +74,32 @@ void Ogre3D::createScene(void)
 	/* =========== Get Ogre Bones by Joints ========== */
 	m_pSkeleton = m_pPlayer->getSkeleton();
 //>>>	m_pBones = m_pSkeleton->getRootBone();
-	m_pBones = m_pSkeleton->getBone("Joint2");
-	m_pBones->setManuallyControlled(true);
+
+	// Get Ogre Bones to match Kinect Joint
+	m_pBones = m_pSkeleton->getBone("Joint10");	// ShoulderLeft
+	m_BoneArray[0] = m_pBones;
+	m_pBones = m_pSkeleton->getBone("Joint11");	// ElbowLeft
+	m_BoneArray[1] = m_pBones;
+	m_pBones = m_pSkeleton->getBone("Joint15");	// ShoulderRight
+	m_BoneArray[2] = m_pBones;
+	m_pBones = m_pSkeleton->getBone("Joint16");	// ElbowRight
+	m_BoneArray[3] = m_pBones;
+	m_pBones = m_pSkeleton->getBone("Joint18");	// HipLeft
+	m_BoneArray[4] = m_pBones;
+	m_pBones = m_pSkeleton->getBone("Joint19");	// KneeLeft
+	m_BoneArray[5] = m_pBones;
+	m_pBones = m_pSkeleton->getBone("Joint23");	// HipRight
+	m_BoneArray[6] = m_pBones;
+	m_pBones = m_pSkeleton->getBone("Joint24");	// KneeRight
+	m_BoneArray[7] = m_pBones;
+
+	for (int i = 0; i < ARR_SIZE; i++)
+	{
+		m_BoneArray[i]->setManuallyControlled(true);
+	}
 
 
+	/* ================ Set Ground and Shadow Effect ================ */
 	// Create a plane
     Ogre::Plane plane(Ogre::Vector3::UNIT_Y, 0);
 	
@@ -243,22 +266,48 @@ void Ogre3D::DrawSkeleton(const NUI_SKELETON_DATA & skel)
     {
 //>>>		m_pPlayerNode->setPosition(Ogre::Vector3(0.0f, 0.0f, m_Points[0].z));
 
-		Ogre::Vector3 oldArm = m_PointsOld[NUI_SKELETON_POSITION_WRIST_LEFT] - m_PointsOld[NUI_SKELETON_POSITION_SHOULDER_LEFT];
-		Ogre::Vector3 newArm = m_Points[NUI_SKELETON_POSITION_WRIST_LEFT] - m_Points[NUI_SKELETON_POSITION_SHOULDER_LEFT];
-		
-		oldArm.normalise();
-		newArm.normalise();
+		Ogre::Vector3* oldBones = new Ogre::Vector3[8];
+		oldBones[0] = m_PointsOld[NUI_SKELETON_POSITION_ELBOW_LEFT] - m_PointsOld[NUI_SKELETON_POSITION_SHOULDER_LEFT];
+		oldBones[1] = m_PointsOld[NUI_SKELETON_POSITION_WRIST_LEFT] - m_PointsOld[NUI_SKELETON_POSITION_ELBOW_LEFT];
+		oldBones[2] = m_PointsOld[NUI_SKELETON_POSITION_ELBOW_RIGHT] - m_PointsOld[NUI_SKELETON_POSITION_SHOULDER_RIGHT];
+		oldBones[3] = m_PointsOld[NUI_SKELETON_POSITION_WRIST_RIGHT] - m_PointsOld[NUI_SKELETON_POSITION_ELBOW_RIGHT];
+		oldBones[4] = m_PointsOld[NUI_SKELETON_POSITION_KNEE_LEFT] - m_PointsOld[NUI_SKELETON_POSITION_HIP_LEFT];
+		oldBones[5] = m_PointsOld[NUI_SKELETON_POSITION_ANKLE_LEFT] - m_PointsOld[NUI_SKELETON_POSITION_KNEE_LEFT];
+		oldBones[6] = m_PointsOld[NUI_SKELETON_POSITION_KNEE_RIGHT] - m_PointsOld[NUI_SKELETON_POSITION_HIP_RIGHT];
+		oldBones[7] = m_PointsOld[NUI_SKELETON_POSITION_ANKLE_RIGHT] - m_PointsOld[NUI_SKELETON_POSITION_KNEE_RIGHT];
 
-		Ogre::Vector3 axis = oldArm.crossProduct(newArm);
+		Ogre::Vector3* newBones = new Ogre::Vector3[8];
+		newBones[0] = m_Points[NUI_SKELETON_POSITION_ELBOW_LEFT] - m_Points[NUI_SKELETON_POSITION_SHOULDER_LEFT];
+		newBones[1] = m_Points[NUI_SKELETON_POSITION_WRIST_LEFT] - m_Points[NUI_SKELETON_POSITION_ELBOW_LEFT];
+		newBones[2] = m_Points[NUI_SKELETON_POSITION_ELBOW_RIGHT] - m_Points[NUI_SKELETON_POSITION_SHOULDER_RIGHT];
+		newBones[3] = m_Points[NUI_SKELETON_POSITION_WRIST_RIGHT] - m_Points[NUI_SKELETON_POSITION_ELBOW_RIGHT];
+		newBones[4] = m_Points[NUI_SKELETON_POSITION_KNEE_LEFT] - m_Points[NUI_SKELETON_POSITION_HIP_LEFT];
+		newBones[5] = m_Points[NUI_SKELETON_POSITION_ANKLE_LEFT] - m_Points[NUI_SKELETON_POSITION_KNEE_LEFT];
+		newBones[6] = m_Points[NUI_SKELETON_POSITION_KNEE_RIGHT] - m_Points[NUI_SKELETON_POSITION_HIP_RIGHT];
+		newBones[7] = m_Points[NUI_SKELETON_POSITION_ANKLE_RIGHT] - m_Points[NUI_SKELETON_POSITION_KNEE_RIGHT];
+
+		Ogre::Vector3* axis = new Ogre::Vector3[ARR_SIZE];
+		Ogre::Radian* angle = new Ogre::Radian[ARR_SIZE];
 		Ogre::Math math;
-		Ogre::Radian angle = math.ACos(oldArm.dotProduct(newArm));
 
-		m_pBones->rotate(axis, angle);
+		for(int i = 0; i < ARR_SIZE; i++)
+		{
+			oldBones[i].normalise();
+			newBones[i].normalise();
+
+			axis[i] = oldBones[i].crossProduct(newBones[i]);
+			angle[i] = math.ACos(oldBones[i].dotProduct(newBones[i]));
+		}
+
+		for (int i = 0; i < ARR_SIZE; i++)
+		{
+			m_BoneArray[i]->rotate(axis[i], angle[i]);
+		}
     }
 	else if ( skel.eSkeletonPositionTrackingState[0] == NUI_SKELETON_POSITION_TRACKED )
     {
 //>>>		m_pPlayerNode->setPosition(Ogre::Vector3(0.0f, 0.0f, m_Points[0].z));
-
+		/*
 		Ogre::Vector3 oldArm = m_PointsOld[NUI_SKELETON_POSITION_WRIST_LEFT] - m_PointsOld[NUI_SKELETON_POSITION_SHOULDER_LEFT];
 		Ogre::Vector3 newArm = m_Points[NUI_SKELETON_POSITION_WRIST_LEFT] - m_Points[NUI_SKELETON_POSITION_SHOULDER_LEFT];
 
@@ -269,7 +318,46 @@ void Ogre3D::DrawSkeleton(const NUI_SKELETON_DATA & skel)
 		Ogre::Math math;
 		Ogre::Radian angle = math.ACos(oldArm.dotProduct(newArm));
 
-		m_pBones->rotate(axis, angle);
+		m_BoneArray[1]->rotate(axis, angle);
+		*/
+
+		Ogre::Vector3* oldBones = new Ogre::Vector3[8];
+		oldBones[0] = m_PointsOld[NUI_SKELETON_POSITION_ELBOW_LEFT] - m_PointsOld[NUI_SKELETON_POSITION_SHOULDER_LEFT];
+		oldBones[1] = m_PointsOld[NUI_SKELETON_POSITION_WRIST_LEFT] - m_PointsOld[NUI_SKELETON_POSITION_ELBOW_LEFT];
+		oldBones[2] = m_PointsOld[NUI_SKELETON_POSITION_ELBOW_RIGHT] - m_PointsOld[NUI_SKELETON_POSITION_SHOULDER_RIGHT];
+		oldBones[3] = m_PointsOld[NUI_SKELETON_POSITION_WRIST_RIGHT] - m_PointsOld[NUI_SKELETON_POSITION_ELBOW_RIGHT];
+		oldBones[4] = m_PointsOld[NUI_SKELETON_POSITION_KNEE_LEFT] - m_PointsOld[NUI_SKELETON_POSITION_HIP_LEFT];
+		oldBones[5] = m_PointsOld[NUI_SKELETON_POSITION_ANKLE_LEFT] - m_PointsOld[NUI_SKELETON_POSITION_KNEE_LEFT];
+		oldBones[6] = m_PointsOld[NUI_SKELETON_POSITION_KNEE_RIGHT] - m_PointsOld[NUI_SKELETON_POSITION_HIP_RIGHT];
+		oldBones[7] = m_PointsOld[NUI_SKELETON_POSITION_ANKLE_RIGHT] - m_PointsOld[NUI_SKELETON_POSITION_KNEE_RIGHT];
+
+		Ogre::Vector3* newBones = new Ogre::Vector3[8];
+		newBones[0] = m_Points[NUI_SKELETON_POSITION_ELBOW_LEFT] - m_Points[NUI_SKELETON_POSITION_SHOULDER_LEFT];
+		newBones[1] = m_Points[NUI_SKELETON_POSITION_WRIST_LEFT] - m_Points[NUI_SKELETON_POSITION_ELBOW_LEFT];
+		newBones[2] = m_Points[NUI_SKELETON_POSITION_ELBOW_RIGHT] - m_Points[NUI_SKELETON_POSITION_SHOULDER_RIGHT];
+		newBones[3] = m_Points[NUI_SKELETON_POSITION_WRIST_RIGHT] - m_Points[NUI_SKELETON_POSITION_ELBOW_RIGHT];
+		newBones[4] = m_Points[NUI_SKELETON_POSITION_KNEE_LEFT] - m_Points[NUI_SKELETON_POSITION_HIP_LEFT];
+		newBones[5] = m_Points[NUI_SKELETON_POSITION_ANKLE_LEFT] - m_Points[NUI_SKELETON_POSITION_KNEE_LEFT];
+		newBones[6] = m_Points[NUI_SKELETON_POSITION_KNEE_RIGHT] - m_Points[NUI_SKELETON_POSITION_HIP_RIGHT];
+		newBones[7] = m_Points[NUI_SKELETON_POSITION_ANKLE_RIGHT] - m_Points[NUI_SKELETON_POSITION_KNEE_RIGHT];
+
+		Ogre::Vector3* axis = new Ogre::Vector3[ARR_SIZE];
+		Ogre::Radian* angle = new Ogre::Radian[ARR_SIZE];
+		Ogre::Math math;
+
+		for(int i = 0; i < ARR_SIZE; i++)
+		{
+			oldBones[i].normalise();
+			newBones[i].normalise();
+
+			axis[i] = oldBones[i].crossProduct(newBones[i]);
+			angle[i] = math.ACos(oldBones[i].dotProduct(newBones[i]));
+		}
+
+		for (int i = 0; i < ARR_SIZE; i++)
+		{
+			m_BoneArray[i]->rotate(axis[i], angle[i]);
+		}
     }
 }
 

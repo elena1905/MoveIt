@@ -25,35 +25,15 @@ protected:
     virtual void createScene(void);
 	virtual void createCamera(void);
 	virtual void createViewports(void);
-	
-	virtual void createFrameListener(void); 
     virtual bool frameRenderingQueued(const Ogre::FrameEvent &evt);
-    virtual bool nextLocation(void);
-
-	Ogre::Real mDistance;                  // The distance the object has left to travel
-    Ogre::Vector3 mDirection;              // The direction the object is moving
-    Ogre::Vector3 mDestination;            // The destination the object is moving towards
- 
-    Ogre::AnimationState *mAnimationState; // The current animation state of the object
- 
-    Ogre::Entity *mEntity;                 // The Entity we are animating
-    Ogre::SceneNode *mNode;                // The -SceneNode that the Entity is attached to
-    std::deque<Ogre::Vector3> mWalkList;   // The list of points we are walking to
- 
-    Ogre::Real mWalkSpeed;                 // The speed at which the object is moving
 
 	/* Skeleton Entities and skeleton SceneNode */
 	Ogre::SceneNode* m_pPlayerNode;
 	Ogre::Entity* m_pPlayer;
 
-
-	// Test joints
+	// Ogre Skeleton and Bones
 	Ogre::SkeletonInstance* m_pSkeleton;
 	Ogre::Bone* m_pBones;
-	Ogre::Bone* m_pBones2;
-
-	Ogre::SceneNode* m_pSkeletonNode;
-	Ogre::Entity* m_pHead;
 
 	/* Kinect Members and Methods */
 	bool                    m_bSeatedMode;

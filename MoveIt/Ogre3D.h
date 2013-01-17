@@ -29,6 +29,8 @@ protected:
 	virtual void createViewports(void);
     virtual bool frameRenderingQueued(const Ogre::FrameEvent &evt);
 
+	Ogre::Vector3 m_Basis;
+
 	/* Skeleton Entities and skeleton SceneNode */
 	Ogre::SceneNode* m_pPlayerNode;
 	Ogre::Entity* m_pPlayer;

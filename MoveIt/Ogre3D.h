@@ -19,6 +19,9 @@
 
 class Ogre3D : public Ogre3DBase
 {
+	static const int        cScreenWidth  = 320;
+	static const int        cScreenHeight = 240;
+
 public:
     Ogre3D(void);
     virtual ~Ogre3D(void);
@@ -30,6 +33,13 @@ protected:
     virtual bool frameRenderingQueued(const Ogre::FrameEvent &evt);
 
 	Ogre::Vector3 m_Basis;
+	Ogre::Quaternion m_QuatPI;
+	Ogre::Math m_Math;
+	Ogre::Radian TWOPI;
+	Ogre::Radian PI;
+	Ogre::Radian PIOVER2;
+
+	Ogre::Viewport* m_pViewport;
 
 	/* Skeleton Entities and skeleton SceneNode */
 	Ogre::SceneNode* m_pPlayerNode;
@@ -39,7 +49,6 @@ protected:
 	static const int ARR_SIZE = 8;
 	std::array<Ogre::Bone*, ARR_SIZE> m_BoneArray;
 	Ogre::SkeletonInstance* m_pSkeleton;
-	Ogre::Bone* m_pBones;
 
 	/* Kinect Members and Methods */
 	bool                    m_bSeatedMode;
@@ -47,8 +56,7 @@ protected:
     // Current Kinect
     INuiSensor*             m_pNuiSensor;
 
-	Ogre::Vector3            m_Points[NUI_SKELETON_POSITION_COUNT];
-	Ogre::Vector3            m_PointsOld[NUI_SKELETON_POSITION_COUNT];
+	Ogre::Vector3           m_Points[NUI_SKELETON_POSITION_COUNT];
 
 	HANDLE                  m_pSkeletonStreamHandle;
     HANDLE                  m_hNextSkeletonEvent;
@@ -56,7 +64,7 @@ protected:
 	HRESULT                 CreateFirstConnected();
 	void                    ProcessSkeleton();
 	void                    DrawSkeleton(const NUI_SKELETON_DATA & skel);
-	Ogre::Vector3           SkeletonToVector(Vector4 skeletonPoint);
+	Ogre::Vector3           SkeletonToVector3(Vector4 skeletonPoint);
 };
 
  

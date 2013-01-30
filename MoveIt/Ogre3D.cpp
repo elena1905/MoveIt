@@ -262,7 +262,7 @@ void Ogre3D::DrawSkeleton(const NUI_SKELETON_DATA & skel)
     }
 
 	// Set the model's position
-	m_pPlayerNode->setPosition(Ogre::Vector3(m_Points[0].x, 0.0f, m_Points[0].z));
+	m_pPlayerNode->setPosition(Ogre::Vector3(m_Points[0].x, 0.0f, -m_Points[0].z));
 //	m_pPlayerNode->setPosition(m_Points[NUI_SKELETON_POSITION_SPINE]);
 
 	// Calculate bone rotation vectors
@@ -319,7 +319,7 @@ Ogre::Vector3 Ogre3D::SkeletonToVector3(Vector4 skeletonPoint)
 
 	float posX = static_cast<float>(x);
 	float posY = 300.0f - static_cast<float>(y);
-	float posZ = 20.0f;
+	float posZ = static_cast<float>(depth) / 100; // Unit of depth value is millimeter
 
 	Ogre::Vector3 position = Ogre::Vector3(posX, posY, posZ);
 

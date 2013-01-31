@@ -63,7 +63,7 @@ protected:
 
 	HRESULT                 CreateFirstConnected();
 	void                    ProcessSkeleton();
-	void                    DrawSkeleton(const NUI_SKELETON_DATA & skel);
+	void                    RotateBones(const NUI_SKELETON_DATA & skel);
 	Ogre::Vector3           SkeletonToVector3(Vector4 skeletonPoint);
 };
 

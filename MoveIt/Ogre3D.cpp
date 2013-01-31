@@ -241,19 +241,19 @@ void Ogre3D::ProcessSkeleton()
 
         if (NUI_SKELETON_TRACKED == trackingState)
         {
-            // We're tracking the skeleton, draw it
-            DrawSkeleton(skeletonFrame.SkeletonData[i]);
+            // We're tracking the skeleton, rotate the bones
+            RotateBones(skeletonFrame.SkeletonData[i]);
         }
         else if (NUI_SKELETON_POSITION_ONLY == trackingState)
         {
-			// Draw it anyway
-			DrawSkeleton(skeletonFrame.SkeletonData[i]);
+			// Rotate the bones
+			RotateBones(skeletonFrame.SkeletonData[i]);
         }
     }
 }
 
 //-------------------------------------------------------------------------------------
-void Ogre3D::DrawSkeleton(const NUI_SKELETON_DATA & skel)
+void Ogre3D::RotateBones(const NUI_SKELETON_DATA & skel)
 {
 	// Convert skeleton positions to vector3 format
     for (int i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i)
@@ -261,9 +261,19 @@ void Ogre3D::DrawSkeleton(const NUI_SKELETON_DATA & skel)
         m_Points[i] = SkeletonToVector3(skel.SkeletonPositions[i]);
     }
 
+	// Get the central joint: HIP_CENTER
+	Ogre::Vector3 centerPos = m_Points[NUI_SKELETON_POSITION_HIP_CENTER];
+	Ogre::Real centerX = centerPos.x;
+	Ogre::Real centerZ = centerPos.z;
+
 	// Set the model's position
-	m_pPlayerNode->setPosition(Ogre::Vector3(m_Points[0].x, 0.0f, -m_Points[0].z));
-//	m_pPlayerNode->setPosition(m_Points[NUI_SKELETON_POSITION_SPINE]);
+	m_pPlayerNode->setPosition(Ogre::Vector3(centerX, 0.0f, -centerZ));
+
+	// Calculate the symmetrical x against centerX to map Kinect coordinate to Ogre coordinate
+	for (int i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i)
+	{
+		m_Points[i].x = 2 * centerX - m_Points[i].x;
+	}
 
 	// Calculate bone rotation vectors
 	Ogre::Vector3* bonesRot = new Ogre::Vector3[ARR_SIZE];
@@ -297,7 +307,6 @@ void Ogre3D::DrawSkeleton(const NUI_SKELETON_DATA & skel)
 			angle = -m_Math.ACos(bonesRot[i].dotProduct(m_Basis));
 			
 			q.FromAngleAxis(angle, axis);
-			//q = m_QuatPI * q;
 			
 			m_BoneArray[i]->setInheritOrientation(false);
 			m_BoneArray[i]->setOrientation(q);

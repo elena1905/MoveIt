@@ -297,7 +297,7 @@ void Ogre3D::DrawSkeleton(const NUI_SKELETON_DATA & skel)
 			angle = -m_Math.ACos(bonesRot[i].dotProduct(m_Basis));
 			
 			q.FromAngleAxis(angle, axis);
-			q = m_QuatPI * q;
+			//q = m_QuatPI * q;
 			
 			m_BoneArray[i]->setInheritOrientation(false);
 			m_BoneArray[i]->setOrientation(q);

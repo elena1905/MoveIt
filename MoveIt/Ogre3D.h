@@ -53,9 +53,11 @@ protected:
 
 	// Manual curved line
 	static const int QUEUE_SIZE = 40;
-	std::queue<Ogre::Vector3> m_PointQueue;
+	std::queue<Ogre::Vector3> m_PointQueL;
+	std::queue<Ogre::Vector3> m_PointQueR;
 	Ogre::SceneNode* m_pLineNode;
-	Ogre::ManualObject* m_pCurvedLine;
+	Ogre::ManualObject* m_pLineL;
+	Ogre::ManualObject* m_pLineR;
 
 	/* Kinect Members and Methods */
 	bool                    m_bSeatedMode;

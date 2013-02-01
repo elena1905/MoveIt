@@ -64,10 +64,13 @@ void Ogre3D::createScene(void)
 	// Rotate the player model to face the camera
 	m_pPlayerNode->rotate(m_QuatPI);
 
-	// Create manual object for drawing curved line
-	m_pCurvedLine = mSceneMgr->createManualObject("manual");
+	// Create manual object for drawing curved lines to show motions of both arm
+	m_pLineL = mSceneMgr->createManualObject("manualLeft");
+	m_pLineR = mSceneMgr->createManualObject("manualRight");
+
 	m_pLineNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("LineNode", Ogre::Vector3(0.0f, 0.0f, 0.0f));
-	m_pLineNode->attachObject(m_pCurvedLine);
+	m_pLineNode->attachObject(m_pLineL);
+	m_pLineNode->attachObject(m_pLineR);
 	
 
 	/* =========== Get Ogre Bones by Joints ========== */
@@ -266,10 +269,11 @@ void Ogre3D::RotateBones(const NUI_SKELETON_DATA & skel)
     }
 
 	// Get the central point: HIP_CENTER
-	Ogre::Real centerX, centerY, centerZ, lineX;
+	Ogre::Real centerX, centerY, centerZ, lineXL, lineXR;
 	centerX = m_Points[NUI_SKELETON_POSITION_HIP_CENTER].x;
 //	centerY = m_Points[NUI_SKELETON_POSITION_SHOULDER_CENTER].y;
-	lineX = m_Points[NUI_SKELETON_POSITION_WRIST_LEFT].x;
+	lineXL = m_Points[NUI_SKELETON_POSITION_WRIST_LEFT].x;
+	lineXR = m_Points[NUI_SKELETON_POSITION_WRIST_RIGHT].x;
 
 	// Map Kinect coordinate to Ogre coordinate
 	for (int i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i)
@@ -285,31 +289,47 @@ void Ogre3D::RotateBones(const NUI_SKELETON_DATA & skel)
 	m_pPlayerNode->setPosition(Ogre::Vector3(centerX, 0.0f, centerZ));
 
 
-	// Draw curved line
-	Ogre::Vector3 linePos = m_Points[NUI_SKELETON_POSITION_WRIST_LEFT];
-	linePos.x = lineX;
-	m_PointQueue.push(linePos);
-	if (m_PointQueue.size() > QUEUE_SIZE)
+	// Draw curved line for both arms
+	Ogre::Vector3 linePosL = m_Points[NUI_SKELETON_POSITION_WRIST_LEFT];
+	Ogre::Vector3 linePosR = m_Points[NUI_SKELETON_POSITION_WRIST_RIGHT];
+	linePosL.x = lineXL;
+	linePosR.x = lineXR;
+
+	m_PointQueL.push(linePosL);
+	m_PointQueR.push(linePosR);
+	if (m_PointQueL.size() > QUEUE_SIZE)
 	{
-		m_PointQueue.pop();
+		m_PointQueL.pop();
+		m_PointQueR.pop();
 	}
 
-	m_pCurvedLine->clear();
+	m_pLineL->clear();
+	m_pLineR->clear();
 
-	m_pCurvedLine->begin("BaseWhiteNoLighting", Ogre::RenderOperation::OT_LINE_STRIP);
-	std::queue<Ogre::Vector3> temp;
-	while (m_PointQueue.size())
+	m_pLineL->begin("BaseWhiteNoLighting", Ogre::RenderOperation::OT_LINE_STRIP);
+	m_pLineR->begin("BaseWhiteNoLighting", Ogre::RenderOperation::OT_LINE_STRIP);
+	std::queue<Ogre::Vector3> tempL, tempR;
+	while (m_PointQueL.size())
 	{
-		m_pCurvedLine->position(m_PointQueue.front());
-		temp.push(m_PointQueue.front());
-		m_PointQueue.pop();
+		m_pLineL->position(m_PointQueL.front());
+		m_pLineL->colour(0.8f, 0.2f, 0.2f);
+		tempL.push(m_PointQueL.front());
+		m_PointQueL.pop();
+
+		m_pLineR->position(m_PointQueR.front());
+		tempR.push(m_PointQueR.front());
+		m_PointQueR.pop();
 	}
-	m_pCurvedLine->end();
+	m_pLineL->end();
+	m_pLineR->end();
 
-	while (temp.size())
+	while (tempL.size())
 	{
-		m_PointQueue.push(temp.front());
-		temp.pop();
+		m_PointQueL.push(tempL.front());
+		tempL.pop();
+
+		m_PointQueR.push(tempR.front());
+		tempR.pop();
 	}
 
 

@@ -15,6 +15,7 @@
 #include "NuiApi.h"
 //#include "KinectBase.h"
 #include <array>
+#include <queue>
 
 
 class Ogre3D : public Ogre3DBase
@@ -49,6 +50,12 @@ protected:
 	static const int ARR_SIZE = 8;
 	std::array<Ogre::Bone*, ARR_SIZE> m_BoneArray;
 	Ogre::SkeletonInstance* m_pSkeleton;
+
+	// Manual curved line
+	static const int QUEUE_SIZE = 40;
+	std::queue<Ogre::Vector3> m_PointQueue;
+	Ogre::SceneNode* m_pLineNode;
+	Ogre::ManualObject* m_pCurvedLine;
 
 	/* Kinect Members and Methods */
 	bool                    m_bSeatedMode;

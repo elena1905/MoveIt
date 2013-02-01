@@ -60,11 +60,15 @@ void Ogre3D::createScene(void)
 	m_pPlayer->setCastShadows(true);
 	m_pPlayerNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("PlayerNode", Ogre::Vector3(160.0f, 0.0f, 0.0f));
 	m_pPlayerNode->attachObject(m_pPlayer);
-//	m_pPlayerNode->setScale(0.5f, 0.5f, 0.5f);
 	
 	// Rotate the player model to face the camera
 	m_pPlayerNode->rotate(m_QuatPI);
 
+	// Create manual object for drawing curved line
+	m_pCurvedLine = mSceneMgr->createManualObject("manual");
+	m_pLineNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("LineNode", Ogre::Vector3(0.0f, 0.0f, 0.0f));
+	m_pLineNode->attachObject(m_pCurvedLine);
+	
 
 	/* =========== Get Ogre Bones by Joints ========== */
 	m_pSkeleton = m_pPlayer->getSkeleton();
@@ -261,19 +265,54 @@ void Ogre3D::RotateBones(const NUI_SKELETON_DATA & skel)
         m_Points[i] = SkeletonToVector3(skel.SkeletonPositions[i]);
     }
 
-	// Get the central joint: HIP_CENTER
-	Ogre::Vector3 centerPos = m_Points[NUI_SKELETON_POSITION_HIP_CENTER];
-	Ogre::Real centerX = centerPos.x;
-	Ogre::Real centerZ = centerPos.z;
+	// Get the central point: HIP_CENTER
+	Ogre::Real centerX, centerY, centerZ, lineX;
+	centerX = m_Points[NUI_SKELETON_POSITION_HIP_CENTER].x;
+//	centerY = m_Points[NUI_SKELETON_POSITION_SHOULDER_CENTER].y;
+	lineX = m_Points[NUI_SKELETON_POSITION_WRIST_LEFT].x;
 
-	// Set the model's position
-	m_pPlayerNode->setPosition(Ogre::Vector3(centerX, 0.0f, -centerZ));
-
-	// Calculate the symmetrical x against centerX to map Kinect coordinate to Ogre coordinate
+	// Map Kinect coordinate to Ogre coordinate
 	for (int i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i)
 	{
 		m_Points[i].x = 2 * centerX - m_Points[i].x;
+		m_Points[i].y = 220.0f - m_Points[i].y;
+//		m_Points[i].y = 2 * centerY - m_Points[i].y;
+		m_Points[i].z = m_Points[i].z / 100;
 	}
+
+	// Set the model's position
+	centerZ = -m_Points[NUI_SKELETON_POSITION_HIP_CENTER].z;
+	m_pPlayerNode->setPosition(Ogre::Vector3(centerX, 0.0f, centerZ));
+
+
+	// Draw curved line
+	Ogre::Vector3 linePos = m_Points[NUI_SKELETON_POSITION_WRIST_LEFT];
+	linePos.x = lineX;
+	m_PointQueue.push(linePos);
+	if (m_PointQueue.size() > QUEUE_SIZE)
+	{
+		m_PointQueue.pop();
+	}
+
+	m_pCurvedLine->clear();
+
+	m_pCurvedLine->begin("BaseWhiteNoLighting", Ogre::RenderOperation::OT_LINE_STRIP);
+	std::queue<Ogre::Vector3> temp;
+	while (m_PointQueue.size())
+	{
+		m_pCurvedLine->position(m_PointQueue.front());
+		temp.push(m_PointQueue.front());
+		m_PointQueue.pop();
+	}
+	m_pCurvedLine->end();
+
+	while (temp.size())
+	{
+		m_PointQueue.push(temp.front());
+		temp.pop();
+	}
+
+
 
 	// Calculate bone rotation vectors
 	Ogre::Vector3* bonesRot = new Ogre::Vector3[ARR_SIZE];
@@ -327,8 +366,8 @@ Ogre::Vector3 Ogre3D::SkeletonToVector3(Vector4 skeletonPoint)
     NuiTransformSkeletonToDepthImage(skeletonPoint, &x, &y, &depth);
 
 	float posX = static_cast<float>(x);
-	float posY = 300.0f - static_cast<float>(y);
-	float posZ = static_cast<float>(depth) / 100; // Unit of depth value is millimeter
+	float posY = static_cast<float>(y);
+	float posZ = static_cast<float>(depth); // Unit of depth value is millimeter
 
 	Ogre::Vector3 position = Ogre::Vector3(posX, posY, posZ);
 

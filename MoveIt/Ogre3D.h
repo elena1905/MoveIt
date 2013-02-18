@@ -13,13 +13,17 @@
 #include "Ogre3DBase.h"
 #include "resource.h"
 #include "NuiApi.h"
+#include <strsafe.h>
 //#include "KinectBase.h"
 
-// Include msxml6.dll from stdafx.h to make use of DOM
+// Include xerces XML parser from stdafx.h
 #include "stdafx.h"
 
 #include <array>
 #include <queue>
+
+// To make use of xerces XML parser
+using namespace xercesc;
 
 
 class Ogre3D : public Ogre3DBase
@@ -84,8 +88,6 @@ protected:
 	Ogre::Vector3           SkeletonToVector3(Vector4 skeletonPoint);
 
 	// DOM XML Parser
-	IXMLDOMDocumentPtr m_pDomDocument;
-	IXMLDOMElementPtr m_pDomRoot;
 };
 
  

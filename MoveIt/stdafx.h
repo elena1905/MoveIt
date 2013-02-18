@@ -17,13 +17,23 @@
 
 // Direct2D Header Files
 #include <d2d1.h>
+#pragma comment ( lib, "d2d1.lib" )
 
-// DOM Header Files
+// MSXML DOM Header Files
+/*
 #include <stdio.h>
 #include <tchar.h>
 #import "msxml6.dll" raw_interfaces_only
+*/
 
-#pragma comment ( lib, "d2d1.lib" )
+// xerces XML Parser Header Files
+#include <xercesc/dom/DOM.hpp>
+#include <xercesc/framework/StdOutFormatTarget.hpp>
+#include <xercesc/framework/LocalFileFormatTarget.hpp>
+#include <iostream>
+#pragma comment(lib,"xerces-c_3.lib")
+
+
 
 #ifdef _UNICODE
 #if defined _M_IX86

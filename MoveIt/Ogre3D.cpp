@@ -8,8 +8,7 @@
  */
 
 #include "Ogre3D.h"
-#include "stdafx.h"
-#include <strsafe.h>
+
 
 //-------------------------------------------------------------------------------------
 Ogre3D::Ogre3D(void):
@@ -45,6 +44,40 @@ void Ogre3D::createScene(void)
 {
 	/* ========= Create KinectSensor instance for the first connected sensor ========== */
 	CreateFirstConnected();
+
+
+	/* ========= Test xerces XML parser ========== */
+	try
+	{
+		XMLPlatformUtils::Initialize();
+
+		XMLCh str[100];
+		XMLString::transcode("Core", str, 99);
+		DOMImplementation* imp = DOMImplementationRegistry::getDOMImplementation(str);
+		XMLString::transcode("root", str, 99);
+		xercesc::DOMDocument *doc = imp->createDocument(0, str, 0);
+		XMLString::transcode("node", str, 99);
+		DOMElement *node = doc->createElement(str);
+		node->setAttribute(XMLString::transcode("id"), XMLString::transcode("1"));
+		node->setTextContent(XMLString::transcode("node1"));
+		DOMElement *root = doc->getDocumentElement();
+		root->appendChild(node);
+		DOMLSOutput *output = ((DOMImplementationLS*)imp)->createLSOutput();
+		DOMLSSerializer *serial = ((DOMImplementationLS*)imp)->createLSSerializer();
+		XMLFormatTarget *target = new LocalFileFormatTarget("D:\\ProgramData\\VisualStudio2010\\FYP\\Tutorial\\Tutorial\\2.xml");
+		output->setByteStream(target);
+		serial->write(doc, output);
+
+		doc->release();
+		serial->release();
+		delete target;
+
+		XMLPlatformUtils::Terminate();
+	}  
+	catch (const XMLException& toCatch)
+	{
+		return ;
+	}
 
 
 	/* ========= Set Light and Shadow Type ========== */

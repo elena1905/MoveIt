@@ -56,13 +56,19 @@ void Ogre3D::createScene(void)
 
 
 	/* =========== Create skeleton entities and attach them to skeletonNode ========== */
-	m_pPlayer = mSceneMgr->createEntity("Player", "ninja.mesh");
+	m_pPlayer = mSceneMgr->createEntity("Player", "ninja1.mesh");
 	m_pPlayer->setCastShadows(true);
-	m_pPlayerNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("PlayerNode", Ogre::Vector3(160.0f, 0.0f, 0.0f));
+	m_pPlayerNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("PlayerNode", Ogre::Vector3(160.0f, 0.0f, -250.0f));
 	m_pPlayerNode->attachObject(m_pPlayer);
+
+	m_pPlayer2 = mSceneMgr->createEntity("Player2", "ninja.mesh");
+	m_pPlayer2->setCastShadows(true);
+	m_pPlayerNode2 = mSceneMgr->getRootSceneNode()->createChildSceneNode("PlayerNode2", Ogre::Vector3(360.0f, 0.0f, -250.0f));
+	m_pPlayerNode2->attachObject(m_pPlayer2);
 	
 	// Rotate the player model to face the camera
 	m_pPlayerNode->rotate(m_QuatPI);
+	m_pPlayerNode2->rotate(m_QuatPI);
 
 	// Create manual object for drawing curved lines to show motions of both arm
 	m_pLineL = mSceneMgr->createManualObject("manualLeft");
@@ -75,6 +81,7 @@ void Ogre3D::createScene(void)
 
 	/* =========== Get Ogre Bones by Joints ========== */
 	m_pSkeleton = m_pPlayer->getSkeleton();
+	m_pSkeleton2 = m_pPlayer2->getSkeleton();
 	
 	// Get Ogre Bones to match Kinect Joint
 	m_BoneArray[0] = m_pSkeleton->getBone("Joint10");	// ShoulderLeft
@@ -86,10 +93,20 @@ void Ogre3D::createScene(void)
 	m_BoneArray[6] = m_pSkeleton->getBone("Joint23");	// HipRight
 	m_BoneArray[7] = m_pSkeleton->getBone("Joint24");	// KneeRight
 
+	m_BoneArray2[0] = m_pSkeleton2->getBone("Joint10");	// ShoulderLeft
+	m_BoneArray2[1] = m_pSkeleton2->getBone("Joint11");	// ElbowLeft
+	m_BoneArray2[2] = m_pSkeleton2->getBone("Joint15");	// ShoulderRight
+	m_BoneArray2[3] = m_pSkeleton2->getBone("Joint16");	// ElbowRight
+	m_BoneArray2[4] = m_pSkeleton2->getBone("Joint18");	// HipLeft
+	m_BoneArray2[5] = m_pSkeleton2->getBone("Joint19");	// KneeLeft
+	m_BoneArray2[6] = m_pSkeleton2->getBone("Joint23");	// HipRight
+	m_BoneArray2[7] = m_pSkeleton2->getBone("Joint24");	// KneeRight
+
 	// Enable bones to be manually controlled
 	for (int i = 0; i < ARR_SIZE; i++)
 	{
 		m_BoneArray[i]->setManuallyControlled(true);
+		m_BoneArray2[i]->setManuallyControlled(true);
 	}
 	
 
@@ -117,8 +134,8 @@ void Ogre3D::createCamera(void)
 	mCamera = mSceneMgr->createCamera("PlayerCam");
 
 	// Set the Camera's position and direction
-	mCamera->setPosition(Ogre::Vector3(160, 50, 500));
-	mCamera->lookAt(Ogre::Vector3(160, 120, 0));
+	mCamera->setPosition(Ogre::Vector3(180, 50, 300));
+	mCamera->lookAt(Ogre::Vector3(180, 120, 0));
 
 	// Set the near clip distance
 	mCamera->setNearClipDistance(5);
@@ -287,6 +304,7 @@ void Ogre3D::RotateBones(const NUI_SKELETON_DATA & skel)
 	// Set the model's position
 	centerZ = -m_Points[NUI_SKELETON_POSITION_HIP_CENTER].z;
 	m_pPlayerNode->setPosition(Ogre::Vector3(centerX, 0.0f, centerZ));
+	m_pPlayerNode2->setPosition(Ogre::Vector3(centerX + 200.0f, 0.0f, centerZ));
 
 
 	// Draw curved line for both arms
@@ -294,6 +312,8 @@ void Ogre3D::RotateBones(const NUI_SKELETON_DATA & skel)
 	Ogre::Vector3 linePosR = m_Points[NUI_SKELETON_POSITION_WRIST_RIGHT];
 	linePosL.x = lineXL;
 	linePosR.x = lineXR;
+	linePosL.z = -linePosL.z;
+	linePosR.z = -linePosR.z;
 
 	m_PointQueL.push(linePosL);
 	m_PointQueR.push(linePosR);
@@ -369,6 +389,9 @@ void Ogre3D::RotateBones(const NUI_SKELETON_DATA & skel)
 			
 			m_BoneArray[i]->setInheritOrientation(false);
 			m_BoneArray[i]->setOrientation(q);
+
+			m_BoneArray2[i]->setInheritOrientation(false);
+			m_BoneArray2[i]->setOrientation(q);
 		}
     }
 

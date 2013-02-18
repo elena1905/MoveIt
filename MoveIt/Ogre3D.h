@@ -14,6 +14,10 @@
 #include "resource.h"
 #include "NuiApi.h"
 //#include "KinectBase.h"
+
+// Include msxml6.dll from stdafx.h to make use of DOM
+#include "stdafx.h"
+
 #include <array>
 #include <queue>
 
@@ -45,11 +49,15 @@ protected:
 	/* Skeleton Entities and skeleton SceneNode */
 	Ogre::SceneNode* m_pPlayerNode;
 	Ogre::Entity* m_pPlayer;
+	Ogre::SceneNode* m_pPlayerNode2;
+	Ogre::Entity* m_pPlayer2;
 
 	// Ogre Skeleton and Bones
 	static const int ARR_SIZE = 8;
 	std::array<Ogre::Bone*, ARR_SIZE> m_BoneArray;
 	Ogre::SkeletonInstance* m_pSkeleton;
+	std::array<Ogre::Bone*, ARR_SIZE> m_BoneArray2;
+	Ogre::SkeletonInstance* m_pSkeleton2;
 
 	// Manual curved line
 	static const int QUEUE_SIZE = 40;
@@ -74,6 +82,10 @@ protected:
 	void                    ProcessSkeleton();
 	void                    RotateBones(const NUI_SKELETON_DATA & skel);
 	Ogre::Vector3           SkeletonToVector3(Vector4 skeletonPoint);
+
+	// DOM XML Parser
+	IXMLDOMDocumentPtr m_pDomDocument;
+	IXMLDOMElementPtr m_pDomRoot;
 };
 
  

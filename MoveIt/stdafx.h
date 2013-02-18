@@ -18,6 +18,11 @@
 // Direct2D Header Files
 #include <d2d1.h>
 
+// DOM Header Files
+#include <stdio.h>
+#include <tchar.h>
+#import "msxml6.dll" raw_interfaces_only
+
 #pragma comment ( lib, "d2d1.lib" )
 
 #ifdef _UNICODE

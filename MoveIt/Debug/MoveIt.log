@@ -1,7 +1,7 @@
-﻿Build started 2013/2/18 星期一 23:15:13.
+﻿Build started 2013/2/22 星期五 21:37:23.
      1>Project "D:\ProgramData\VisualStudio2010\FYP\MoveIt\MoveIt\MoveIt.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
-         Touching "Debug\MoveIt.unsuccessfulbuild".
+         Creating "Debug\MoveIt.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
          D:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I"D:\Program Files (x86)\OgreSDK\OgreSDK_vc10_v1-8-1\include" /I"D:\Program Files (x86)\OgreSDK\OgreSDK_vc10_v1-8-1\include\OIS" /I"D:\Program Files (x86)\OgreSDK\OgreSDK_vc10_v1-8-1\include\OGRE" /I"D:\Program Files (x86)\OgreSDK\OgreSDK_vc10_v1-8-1\Samples\Common\include" /I"D:\Program Files (x86)\OgreSDK\OgreSDK_vc10_v1-8-1\boost" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D WIN32_LEAN_AND_MEAN /D INC_OLE2 /D _DEBUG /D _WINDOWS /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt GameApp.cpp Ogre3D.cpp
          Ogre3D.cpp
@@ -3400,8 +3400,9 @@
                  d:\program files (x86)\ogresdk\ogresdk_vc10_v1-8-1\include\ogre\ogretextareaoverlayelement.h(198) : see declaration of 'Ogre::TextAreaOverlayElement::CmdAlignment'
      1>d:\programdata\visualstudio2010\fyp\moveit\moveit\stdafx.h(11): warning C4005: 'WIN32_LEAN_AND_MEAN' : macro redefinition
                  command-line arguments :  see previous definition of 'WIN32_LEAN_AND_MEAN'
-     1>d:\programdata\visualstudio2010\fyp\moveit\moveit\ogre3d.cpp(77): warning C4101: 'toCatch' : unreferenced local variable
-     1>d:\programdata\visualstudio2010\fyp\moveit\moveit\ogre3d.cpp(322): warning C4101: 'centerY' : unreferenced local variable
+     1>d:\programdata\visualstudio2010\fyp\moveit\moveit\ogre3d.cpp(70): warning C4305: '=' : truncation from 'double' to 'Ogre::Real'
+     1>d:\programdata\visualstudio2010\fyp\moveit\moveit\ogre3d.cpp(67): warning C4101: 'scale' : unreferenced local variable
+     1>d:\programdata\visualstudio2010\fyp\moveit\moveit\ogre3d.cpp(346): warning C4101: 'centerY' : unreferenced local variable
          Generating Code...
          Compiling...
          GameApp.cpp
@@ -6828,4 +6829,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:20.78
+Time Elapsed 00:00:20.17

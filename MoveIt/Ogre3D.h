@@ -22,8 +22,6 @@
 #include <array>
 #include <queue>
 
-// To make use of xerces XML parser
-using namespace xercesc;
 
 
 class Ogre3D : public Ogre3DBase
@@ -87,7 +85,8 @@ protected:
 	void                    RotateBones(const NUI_SKELETON_DATA & skel);
 	Ogre::Vector3           SkeletonToVector3(Vector4 skeletonPoint);
 
-	// DOM XML Parser
+	// Test manually created animations
+	Ogre::AnimationState* m_pAnimState;
 };
 
  

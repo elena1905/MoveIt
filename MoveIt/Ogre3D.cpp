@@ -45,39 +45,60 @@ void Ogre3D::createScene(void)
 	/* ========= Create KinectSensor instance for the first connected sensor ========== */
 	CreateFirstConnected();
 
+	
+	/* ========= Test creating animations manually and write to *.skeleton file ========== */
+	Ogre::Entity* myEntity = mSceneMgr->createEntity("ninja1", "ninja1.mesh");
+	Ogre::SceneNode* myNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("NinjaNode",Ogre::Vector3(25.0f, 0.0f, 50.0f));
+	myNode->attachObject(myEntity);
 
-	/* ========= Test xerces XML parser ========== */
-	try
-	{
-		XMLPlatformUtils::Initialize();
+	Ogre::SkeletonInstance* mySkel = myEntity->getSkeleton();
+	Ogre::Bone* myBone = mySkel->getBone("Joint10");
+	myBone->setManuallyControlled(true);
+	myBone->setInheritOrientation(false);
 
-		XMLCh str[100];
-		XMLString::transcode("Core", str, 99);
-		DOMImplementation* imp = DOMImplementationRegistry::getDOMImplementation(str);
-		XMLString::transcode("root", str, 99);
-		xercesc::DOMDocument *doc = imp->createDocument(0, str, 0);
-		XMLString::transcode("node", str, 99);
-		DOMElement *node = doc->createElement(str);
-		node->setAttribute(XMLString::transcode("id"), XMLString::transcode("1"));
-		node->setTextContent(XMLString::transcode("node1"));
-		DOMElement *root = doc->getDocumentElement();
-		root->appendChild(node);
-		DOMLSOutput *output = ((DOMImplementationLS*)imp)->createLSOutput();
-		DOMLSSerializer *serial = ((DOMImplementationLS*)imp)->createLSSerializer();
-		XMLFormatTarget *target = new LocalFileFormatTarget("D:\\ProgramData\\VisualStudio2010\\FYP\\Tutorial\\Tutorial\\2.xml");
-		output->setByteStream(target);
-		serial->write(doc, output);
+	// Create animation manually
+	Ogre::Animation* myAnim = mySkel->createAnimation("test", 1);
+	myAnim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
-		doc->release();
-		serial->release();
-		delete target;
+	Ogre::NodeAnimationTrack* myTrack = myAnim->createNodeTrack(10, myBone);
 
-		XMLPlatformUtils::Terminate();
-	}  
-	catch (const XMLException& toCatch)
-	{
-		return ;
-	}
+	Ogre::Quaternion myQuat;
+	myQuat.FromAngleAxis(PIOVER2, Ogre::Vector3(1.0f, 0.0f, 0.0f));
+	Ogre::Real x, y, z, scale;
+	x = 3.5;
+	y = 5.5;
+	z = 6.2;
+
+	Ogre::TransformKeyFrame* myFrame = myTrack->createNodeKeyFrame(0.0f);
+	myFrame->setTranslate(Ogre::Vector3(-x, -y, z));
+	//myFrame->setScale(Ogre::Vector3(scale, scale, scale));
+
+	myFrame = myTrack->createNodeKeyFrame(0.2f);
+	myFrame->setTranslate(Ogre::Vector3(-x, y, z));
+	myFrame->setRotation(myQuat);
+
+	myFrame = myTrack->createNodeKeyFrame(0.4f);
+	myFrame->setTranslate(Ogre::Vector3(x, -y, -z));
+
+	myFrame = myTrack->createNodeKeyFrame(0.6f);
+	myFrame->setTranslate(Ogre::Vector3(x, -y, z));
+
+	myFrame = myTrack->createNodeKeyFrame(0.8f);
+	myFrame->setTranslate(Ogre::Vector3(-x, y, -z));
+
+	myFrame = myTrack->createNodeKeyFrame(1.0f);
+	myFrame->setTranslate(Ogre::Vector3(-x, -y, z));
+
+	myEntity->refreshAvailableAnimationState();
+
+	// Test playing manually created animation
+	m_pAnimState = myEntity->getAnimationState("test");
+	m_pAnimState->setEnabled(true);
+	m_pAnimState->setLoop(true);
+	
+
+
+	
 
 
 	/* ========= Set Light and Shadow Type ========== */
@@ -199,6 +220,9 @@ bool Ogre3D::frameRenderingQueued(const Ogre::FrameEvent &evt)
 {
 	/* === Kinect: process skeleton streams and draw the cube according to player's position === */
 	ProcessSkeleton();
+
+	// Test manually created animations or test animations from rewritten *.skeleton file
+	m_pAnimState->addTime(evt.timeSinceLastFrame);
 
 	// Test Ogre Bone hierarchy
 	/*

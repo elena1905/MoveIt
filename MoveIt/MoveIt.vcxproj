@@ -93,6 +93,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GameApp.cpp" />
+    <ClCompile Include="KinectHelper.cpp" />
+    <ClCompile Include="MathHelper.cpp" />
     <ClCompile Include="Ogre3D.cpp" />
     <ClCompile Include="Ogre3DBase.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -100,11 +102,15 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameApp.h" />
+    <ClInclude Include="KinectHelper.h" />
+    <ClInclude Include="MathHelper.h" />
     <ClInclude Include="Ogre3D.h" />
     <ClInclude Include="Ogre3DBase.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>

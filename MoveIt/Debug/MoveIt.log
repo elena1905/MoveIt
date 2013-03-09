@@ -1,4 +1,4 @@
-﻿Build started 2013/3/9 星期六 14:56:37.
+﻿Build started 2013/3/9 星期六 15:32:06.
      1>Project "D:\ProgramData\VisualStudio2010\FYP\MoveIt\MoveIt\MoveIt.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\MoveIt.unsuccessfulbuild" because "AlwaysCreate" was specified.
@@ -17016,4 +17016,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:40.15
+Time Elapsed 00:00:40.20

@@ -101,12 +101,13 @@ void Player::ImportAnimation(const Ogre::String& fileName)
 // ------------------------------------------------------------
 void Player::PlayMotion(void)
 {
+	// Enable bones to be manually controlled
+	EnableBoneControl();
+
 	for (int j = 0; j < NUI_SKELETON_COUNT; j++)
 	{
 		for (int i = 0; i < ARR_SIZE; i++)
 		{
-			EnableBoneControl(BoneArray[i]);
-
 			if (!QuaternionQueue[i].empty() && !CentralPosQueue.empty())
 			{
 				SceneNode->setPosition(CentralPosQueue.front());
@@ -124,10 +125,7 @@ void Player::PlayMotion(void)
 void Player::PlayAnimation(const Ogre::String& animName, const Ogre::Real& timeElapsed)
 {
 	// Disable bones to be manually controlled
-	for (int i = 0; i < ARR_SIZE; i++)
-	{
-		DisableBoneControl(BoneArray[i]);
-	}
+	DisableBoneControl();
 
 	AnimationState = Entity->getAnimationState(animName);
 	AnimationState->setEnabled(true);
@@ -137,18 +135,24 @@ void Player::PlayAnimation(const Ogre::String& animName, const Ogre::Real& timeE
 
 
 // ------------------------------------------------------------
-void Player::EnableBoneControl(Ogre::Bone* pBone)
+void Player::EnableBoneControl(void)
 {
-	// Enable bone to be manually controlled
-	pBone->setManuallyControlled(true);
+	// Enable bones to be manually controlled
+	for (int i = 0; i < ARR_SIZE; i++)
+	{
+		BoneArray[i]->setManuallyControlled(true);
+	}
 }
 
 
 // ------------------------------------------------------------
-void Player::DisableBoneControl(Ogre::Bone* pBone)
+void Player::DisableBoneControl(void)
 {
-	// Disable bone to be manually controlled
-	pBone->setManuallyControlled(false);
+	// Disable bones to be manually controlled
+	for (int i = 0; i < ARR_SIZE; i++)
+	{
+		BoneArray[i]->setManuallyControlled(false);
+	}
 }
 
 

@@ -47,8 +47,8 @@ public:
 	
 
 private:
-	void EnableBoneControl(Ogre::Bone* pBone);
-	void DisableBoneControl(Ogre::Bone* pBone);
+	void EnableBoneControl(void);
+	void DisableBoneControl(void);
 
 	// 
 	std::queue<Ogre::Quaternion> QuaternionQueue[ARR_SIZE];

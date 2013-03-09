@@ -16,14 +16,12 @@ KinectHelper::KinectHelper() :
     m_bSeatedMode(false),
     m_pNuiSensor(NULL)
 {
-	m_pMath = new MathHelper();
+
 }
 
 
 KinectHelper::~KinectHelper()
 {
-	delete m_pMath;
-
     if (m_pNuiSensor)
     {
         m_pNuiSensor->NuiShutdown();
@@ -95,8 +93,7 @@ HRESULT KinectHelper::CreateFirstConnected()
 }
 
 
-void KinectHelper::ProcessSkeleton( Ogre::SceneNode* pNode,
-									std::array<Ogre::Bone*, 8>& rBoneArray)
+void KinectHelper::ProcessSkeleton(void)
 {
 	NUI_SKELETON_FRAME skeletonFrame = {0};
 
@@ -109,6 +106,10 @@ void KinectHelper::ProcessSkeleton( Ogre::SceneNode* pNode,
 	// smooth out the skeleton data
 	m_pNuiSensor->NuiTransformSmooth(&skeletonFrame, NULL);
 
+	ClearQuaternionQueue();
+	ClearCentralPosQueue();
+
+	// Process multiple skeletons in a skeleton frame
 	for (int i = 0 ; i < NUI_SKELETON_COUNT; ++i)
 	{
 		NUI_SKELETON_TRACKING_STATE trackingState = skeletonFrame.SkeletonData[i].eTrackingState;
@@ -116,45 +117,41 @@ void KinectHelper::ProcessSkeleton( Ogre::SceneNode* pNode,
 		if (NUI_SKELETON_TRACKED == trackingState)
 		{
 			// We're tracking the skeleton, rotate the bones
-			RotateBones(skeletonFrame.SkeletonData[i], pNode, rBoneArray);
+			RotateBones(skeletonFrame.SkeletonData[i]);
 		}
 		else if (NUI_SKELETON_POSITION_ONLY == trackingState)
 		{
 			// Rotate the bones
-			RotateBones(skeletonFrame.SkeletonData[i], pNode, rBoneArray);
+			RotateBones(skeletonFrame.SkeletonData[i]);
 		}
 	}
 }
 
 
 //-------------------------------------------------------------------------------------
-void KinectHelper::RotateBones( const NUI_SKELETON_DATA & skel,
-								Ogre::SceneNode* pNode, 
-								std::array<Ogre::Bone*, 8>& rBoneArray)
+void KinectHelper::RotateBones(const NUI_SKELETON_DATA & skel)
 {
 	// Convert skeleton positions to vector3 format
+	// Process multiple joints in a skeleton
 	for (int i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i)
 	{
 		m_Points[i] = SkeletonToVector3(skel.SkeletonPositions[i]);
 	}
 
 	// Get the central point: HIP_CENTER
-	Ogre::Real centerX, centerY, centerZ, lineXL, lineXR;
-	centerX = m_Points[NUI_SKELETON_POSITION_HIP_CENTER].x;
-	//	centerY = m_Points[NUI_SKELETON_POSITION_SHOULDER_CENTER].y;
+	m_CentralX = m_Points[NUI_SKELETON_POSITION_HIP_CENTER].x;
+	//	m_CentralY = m_Points[NUI_SKELETON_POSITION_SHOULDER_CENTER].y;
 
 	// Map Kinect coordinate to Ogre coordinate
 	for (int i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i)
 	{
-		m_Points[i].x = 2 * centerX - m_Points[i].x;
-		m_Points[i].y = 220.0f - m_Points[i].y;
-		//		m_Points[i].y = 2 * centerY - m_Points[i].y;
-		m_Points[i].z = m_Points[i].z / 100;
+		MapKinectToOgre(m_Points[i]);
 	}
 
-	// Set the model's position
-	centerZ = -m_Points[NUI_SKELETON_POSITION_HIP_CENTER].z;
-	pNode->setPosition(Ogre::Vector3(centerX, 0.0f, centerZ));
+	// Get the player's central position
+	m_CentralZ = -m_Points[NUI_SKELETON_POSITION_HIP_CENTER].z;
+	Ogre::Vector3 centralPosition = Ogre::Vector3(m_CentralX, 0.0f, m_CentralZ);
+	m_CentralPosQueue.push(centralPosition);
 
 	// Calculate bone rotation vectors
 	Ogre::Vector3* bonesRot = new Ogre::Vector3[ARR_SIZE];
@@ -168,7 +165,6 @@ void KinectHelper::RotateBones( const NUI_SKELETON_DATA & skel,
 	bonesRot[7] = m_Points[NUI_SKELETON_POSITION_ANKLE_RIGHT] - m_Points[NUI_SKELETON_POSITION_KNEE_RIGHT];
 
 	Ogre::Quaternion q;
-
 	Ogre::Vector3 axis;
 	Ogre::Radian angle;
 
@@ -184,13 +180,12 @@ void KinectHelper::RotateBones( const NUI_SKELETON_DATA & skel,
 		{
 			bonesRot[i].normalise();
 
-			axis = bonesRot[i].crossProduct(m_pMath->Basis);
-			angle = -m_pMath->Math.ACos(bonesRot[i].dotProduct(m_pMath->Basis));
+			axis = bonesRot[i].crossProduct(MathHelper::Basis);
+			angle = -MathHelper::Math.ACos(bonesRot[i].dotProduct(MathHelper::Basis));
 
 			q.FromAngleAxis(angle, axis);
 
-			rBoneArray[i]->setInheritOrientation(false);
-			rBoneArray[i]->setOrientation(q);
+			m_QuaternionQueue[i].push(q);
 		}
 	}
 
@@ -214,4 +209,32 @@ Ogre::Vector3 KinectHelper::SkeletonToVector3(Vector4 skeletonPoint)
 	Ogre::Vector3 position = Ogre::Vector3(posX, posY, posZ);
 
 	return position;
+}
+
+
+//-------------------------------------------------------------------------------------
+void KinectHelper::MapKinectToOgre(Ogre::Vector3& kinectPoint)
+{
+	// Map Kinect coordinate to Ogre coordinate
+	kinectPoint.x = 2 * m_CentralX - kinectPoint.x;
+	kinectPoint.y = 220.0f - kinectPoint.y;
+	//		kinectPoint.y = 2 * m_CentralY - kinectPoint.y;
+	kinectPoint.z = kinectPoint.z / 100;
+}
+
+
+//-------------------------------------------------------------------------------------
+void KinectHelper::ClearQuaternionQueue()
+{
+	for (int i = 0; i < ARR_SIZE; i++)
+	{
+		m_QuaternionQueue[i].swap(std::queue<Ogre::Quaternion>());
+	}
+}
+
+
+//-------------------------------------------------------------------------------------
+void KinectHelper::ClearCentralPosQueue()
+{
+	m_CentralPosQueue.swap(std::queue<Ogre::Vector3>());
 }

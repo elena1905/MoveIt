@@ -20,10 +20,12 @@ public:
     MathHelper();
     ~MathHelper();
 
-	Ogre::Vector3 Basis;
-	Ogre::Quaternion PiQuaternion;
-	Ogre::Math Math;
-	Ogre::Radian TWOPI;
-	Ogre::Radian PI;
-	Ogre::Radian PIOVER2;
+	static Ogre::Math Math;
+
+	static Ogre::Radian TWOPI;
+	static Ogre::Radian PI;
+	static Ogre::Radian PIOVER2;
+
+	static Ogre::Vector3 Basis;
+	static Ogre::Quaternion PiQuaternion;
 };

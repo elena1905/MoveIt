@@ -11,6 +11,7 @@
 
 
 #include <array>
+#include <queue>
 
 #include "stdafx.h"
 #include "Ogre3DBase.h"
@@ -29,14 +30,21 @@ public:
     ~KinectHelper();
 
 	HRESULT                 CreateFirstConnected();
-	void                    ProcessSkeleton(Ogre::SceneNode* pNode, 
-											std::array<Ogre::Bone*, 8>& rBoneArray);
-	void                    RotateBones(const NUI_SKELETON_DATA & skel,
-										Ogre::SceneNode* pNode,
-										std::array<Ogre::Bone*, 8>& rBoneArray);
-	Ogre::Vector3           SkeletonToVector3(Vector4 skeletonPoint);
+	
+	void                    ProcessSkeleton(void);
+	void                    RotateBones(const NUI_SKELETON_DATA & skel);
+
+	std::queue<Ogre::Vector3> m_CentralPosQueue;
+	std::queue<Ogre::Quaternion> m_QuaternionQueue[ARR_SIZE];
 
 private:
+	Ogre::Vector3           SkeletonToVector3(Vector4 skeletonPoint);
+	void					MapKinectToOgre(Ogre::Vector3& kinectPoint);
+	void					ClearQuaternionQueue();
+	void					ClearCentralPosQueue();
+
+	Ogre::Real				m_CentralX, m_CentralY, m_CentralZ;
+
 	/* Kinect Members and Methods */
 	bool                    m_bSeatedMode;
 
@@ -47,6 +55,4 @@ private:
 
 	HANDLE                  m_pSkeletonStreamHandle;
 	HANDLE                  m_hNextSkeletonEvent;
-
-	MathHelper*				m_pMath;
 };

@@ -33,6 +33,8 @@ public:
 	//Player* m_pModel;
 	Player* m_pPlayer;
 
+	float mTimeElapsed;
+
 protected:
     virtual void createScene(void);
 	virtual void createCamera(void);

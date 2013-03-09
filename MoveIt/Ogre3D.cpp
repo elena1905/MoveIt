@@ -13,11 +13,9 @@
 //-------------------------------------------------------------------------------------
 Ogre3D::Ogre3D(void)
 {
-	m_pMath = new MathHelper();
-
 	m_pKinectHelper = new KinectHelper();
 
-	m_pPlayer = new Player();
+	mTimeElapsed = 0.0f;
 }
 
 //-------------------------------------------------------------------------------------
@@ -25,7 +23,6 @@ Ogre3D::~Ogre3D(void)
 {
 	delete m_pPlayer;
 	delete m_pKinectHelper;
-	delete m_pMath;
 }
 
 //-------------------------------------------------------------------------------------
@@ -44,11 +41,10 @@ void Ogre3D::createScene(void)
 
 
 	/* =========== Create skeleton entities and attach them to skeletonNode ========== */
-	m_pPlayer->Entity = mSceneMgr->createEntity("Player", "ninja1.mesh");
-
-	m_pPlayer->SceneNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("PlayerNode", Ogre::Vector3(160.0f, 0.0f, 0.0f));
-	
-	m_pPlayer->Init();
+	m_pPlayer = new Player(mSceneMgr);
+	m_pPlayer->InitEntity("Player", "ninja.mesh");
+	m_pPlayer->InitSceneNode("PlayerNode", Ogre::Vector3(160.0f, 0.0f, 0.0f));
+	m_pPlayer->InitSkeleton();
 
 
 	/* ================ Set Ground and Shadow Effect ================ */
@@ -106,7 +102,13 @@ void Ogre3D::createViewports(void)
 bool Ogre3D::frameRenderingQueued(const Ogre::FrameEvent &evt)
 {
 	/* === Kinect: process skeleton streams and draw the cube according to player's position === */
-	m_pKinectHelper->ProcessSkeleton(m_pPlayer->SceneNode, m_pPlayer->BoneArray);
+	m_pKinectHelper->ProcessSkeleton();
+
+	m_pPlayer->SetCentralPosQueue(m_pKinectHelper->m_CentralPosQueue);
+	m_pPlayer->SetQuaternionQueue(m_pKinectHelper->m_QuaternionQueue);
+
+	m_pPlayer->PlayMotion();
+
 
 	// Test manually created animations or test animations from rewritten *.skeleton file
 	//m_pPlayer->AnimationState->addTime(evt.timeSinceLastFrame);

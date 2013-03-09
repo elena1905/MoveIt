@@ -10,51 +10,160 @@
 #include "Player.h"
 
 
-Player::Player()
+Player::Player(Ogre::SceneManager* sceneMgr)
 {
-	m_pMath = new MathHelper();
+	SceneManager = sceneMgr;
 }
 
 
 Player::~Player()
 {
-    delete m_pMath;
+    
 }
 
 
-void Player::Init()
+// ------------------------------------------------------------
+void Player::InitEntity(const Ogre::String& entityName, const Ogre::String& meshName)
 {
-	//Entity->setCastShadows(true);
+	Entity = SceneManager->createEntity(entityName, meshName);
+}
+
+
+// ------------------------------------------------------------
+void Player::InitSceneNode(const Ogre::String& nodeName, const Ogre::Vector3& translate)
+{
+	SceneNode = SceneManager->getRootSceneNode()->createChildSceneNode(nodeName, translate);
 	SceneNode->attachObject(Entity);
-	
-	// Rotate the player model to face the camera
-	SceneNode->rotate(m_pMath->PiQuaternion);
-	
-	
+	SceneNode->rotate(MathHelper::PiQuaternion);
+}
+
+
+// ------------------------------------------------------------
+void Player::InitSkeleton()
+{
 	/* =========== Get Ogre Bones by Joints ========== */
 	SkeletonInstance = Entity->getSkeleton();
 
-	/*
-	Ogre::Bone* myBones[ARR_SIZE];
-	for (int i = 0; i < ARR_SIZE; i++)
-	{
-		myBones[i] = m_pSkeleton->getBone("Joint10");
-	}
-	*/
-	
-	// Get Ogre Bones to match Kinect Joint
-	BoneArray[0] = SkeletonInstance->getBone("Joint10");	// ShoulderLeft
-	BoneArray[1] = SkeletonInstance->getBone("Joint11");	// ElbowLeft
-	BoneArray[2] = SkeletonInstance->getBone("Joint15");	// ShoulderRight
-	BoneArray[3] = SkeletonInstance->getBone("Joint16");	// ElbowRight
-	BoneArray[4] = SkeletonInstance->getBone("Joint18");	// HipLeft
-	BoneArray[5] = SkeletonInstance->getBone("Joint19");	// KneeLeft
-	BoneArray[6] = SkeletonInstance->getBone("Joint23");	// HipRight
-	BoneArray[7] = SkeletonInstance->getBone("Joint24");	// KneeRight
+	// Define joint names
+	JointName[0] = "Joint10";
+	JointName[1] = "Joint11";
+	JointName[2] = "Joint15";
+	JointName[3] = "Joint16";
+	JointName[4] = "Joint18";
+	JointName[5] = "Joint19";
+	JointName[6] = "Joint23";
+	JointName[7] = "Joint24";
 
-	// Enable bones to be manually controlled
+	// Attach joints to bones
 	for (int i = 0; i < ARR_SIZE; i++)
 	{
-		BoneArray[i]->setManuallyControlled(true);
+		BoneArray[i] = SkeletonInstance->getBone(JointName[i]);
+		BoneArray[i]->setInheritOrientation(false);
 	}
+}
+
+
+// ------------------------------------------------------------
+void Player::CreateAnimation(const Ogre::String& animationName, const Ogre::Real& timeLength)
+{
+
+}
+
+
+// ------------------------------------------------------------
+void Player::CreateNodeTrack(const unsigned short& jointHandle, Ogre::Node* jointNode, const Ogre::Real& timeLength)
+{
+
+}
+
+
+// ------------------------------------------------------------
+void Player::CreateKeyFrame(const unsigned short& index, const Ogre::Real& timeLength)
+{
+
+}
+
+
+// ------------------------------------------------------------
+void Player::ExportAnimation(const Ogre::String& fileName)
+{
+
+}
+
+
+// ------------------------------------------------------------
+void Player::ImportAnimation(const Ogre::String& fileName)
+{
+
+}
+
+
+// ------------------------------------------------------------
+void Player::PlayMotion(void)
+{
+	for (int j = 0; j < NUI_SKELETON_COUNT; j++)
+	{
+		for (int i = 0; i < ARR_SIZE; i++)
+		{
+			EnableBoneControl(BoneArray[i]);
+
+			if (!QuaternionQueue[i].empty() && !CentralPosQueue.empty())
+			{
+				SceneNode->setPosition(CentralPosQueue.front());
+				BoneArray[i]->setOrientation(QuaternionQueue[i].front());
+
+				CentralPosQueue.pop();
+				QuaternionQueue[i].pop();
+			}
+		}
+	}
+}
+
+
+// ------------------------------------------------------------
+void Player::PlayAnimation(const Ogre::String& animName, const Ogre::Real& timeElapsed)
+{
+	// Disable bones to be manually controlled
+	for (int i = 0; i < ARR_SIZE; i++)
+	{
+		DisableBoneControl(BoneArray[i]);
+	}
+
+	AnimationState = Entity->getAnimationState(animName);
+	AnimationState->setEnabled(true);
+	AnimationState->setLoop(true);
+	AnimationState->addTime(timeElapsed);
+}
+
+
+// ------------------------------------------------------------
+void Player::EnableBoneControl(Ogre::Bone* pBone)
+{
+	// Enable bone to be manually controlled
+	pBone->setManuallyControlled(true);
+}
+
+
+// ------------------------------------------------------------
+void Player::DisableBoneControl(Ogre::Bone* pBone)
+{
+	// Disable bone to be manually controlled
+	pBone->setManuallyControlled(false);
+}
+
+
+// ------------------------------------------------------------
+void Player::SetQuaternionQueue(std::queue<Ogre::Quaternion> quaternionQueue[ARR_SIZE])
+{
+	for (int i = 0; i < ARR_SIZE; i++)
+	{
+		QuaternionQueue[i].swap(quaternionQueue[i]);
+	}
+}
+
+
+// ------------------------------------------------------------
+void Player::SetCentralPosQueue(std::queue<Ogre::Vector3> centralPosQueue)
+{
+	CentralPosQueue.swap(centralPosQueue);
 }

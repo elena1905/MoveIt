@@ -1,4 +1,4 @@
 MoveIt
 ======
 
-Kinect Ogre3D Havok: Dancing &amp; Physiotherapy Game for FYP
+Kinect Motion Sensing & Capture Dancing Game with Ogre3D
